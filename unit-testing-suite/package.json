@@ -1,0 +1,13 @@
+{
+  "name": "toothmate-unit-testing-suite",
+  "version": "1.0.0",
+  "description": "100+ Unit & Component Isolated Functionality Testing Suite for ToothMate Application",
+  "main": "runner.js",
+  "type": "module",
+  "scripts": {
+    "test": "node runner.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}

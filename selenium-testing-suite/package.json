@@ -1,0 +1,16 @@
+{
+  "name": "toothmate-selenium-web-suite",
+  "version": "1.0.0",
+  "description": "Standalone Node.js 300+ Testcase Selenium Web E2E Automation Testing Suite for ToothMate Web Application",
+  "main": "runner.js",
+  "type": "module",
+  "scripts": {
+    "test": "node runner.js",
+    "test:web": "node runner.js",
+    "generate:report": "node runner.js --report-only"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "selenium-webdriver": "^4.28.1"
+  }
+}

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { API_BASE_URL } from "./apiService";
+import { useLanguage } from "./LanguageContext";
+import LanguageSelector from "./LanguageSelector";
 
 // 🧒 Simple, easy-to-understand questions for Kids
 const childQuestions = [
@@ -271,6 +274,7 @@ const seniorQuestions = [
 export default function AssessmentScreen() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
 
   // ✅ PERSISTENT FIX: Retrieve mode securely from state navigation, and lock it inside localStorage
   const [mode, setMode] = useState<"child" | "adult" | "senior">(() => {
@@ -308,18 +312,23 @@ export default function AssessmentScreen() {
           hasBraces: false,
           bleedingGums: false,
           recededGums: false,
-          hasImplants: false
+          hasImplants: false,
+          heavySmoker: false,
+          aggressiveBrusher: false,
+          sensitivity: false,
+          manualDexterity: false,
+          preventative: false
         };
 
         Object.values(answers).forEach((ansObj) => {
-          if (ansObj.value === true && ansObj.conditionKey in clinicalResponses) {
+          if (ansObj.value === true) {
             clinicalResponses[ansObj.conditionKey] = true;
           }
         });
 
-        console.log("Sending dynamic diagnostic payload matrix to port 8000...");
+        console.log("Sending comprehensive 10-question diagnostic payload to port 8000...", clinicalResponses);
 
-        const response = await fetch("http://localhost:8000/api/assessment/submit", {
+        const response = await fetch(`${API_BASE_URL}/assessment/submit`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -329,13 +338,17 @@ export default function AssessmentScreen() {
         });
 
         const result = await response.json();
-        console.log("Response received from Python:", result);
+        console.log("Response received from Python backend:", result);
 
         if (response.ok && result.success) {
           navigate("/prescription", { 
             state: { 
               technique: result.technique,
               description: result.description,
+              whatItIs: result.whatItIs,
+              howItWorks: result.howItWorks,
+              whySuggested: result.whySuggested,
+              precautions: result.precautions,
               steps: result.steps,
               videoUrl: result.videoUrl,
               mode: mode 
@@ -346,7 +359,7 @@ export default function AssessmentScreen() {
         }
       } catch (error) {
         console.error("Network Fetch Crash Log:", error);
-        alert("Could not link to Python backend. Ensure your Uvicorn terminal is running on port 8000.");
+        alert("Could not link to Python backend. Ensure server is running on port 8000.");
       }
     }
   };
@@ -361,25 +374,30 @@ export default function AssessmentScreen() {
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col p-6">
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium text-[#1E293B]">
-            Question {currentQuestion + 1} of {questions.length}
+    <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6 pb-12 font-sans text-slate-800">
+      <div className="flex items-center justify-between px-1 sm:px-2">
+        <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">{t.assessmentTitle || "Oral Health Assessment"}</h2>
+        <LanguageSelector />
+      </div>
+
+      <div className="gradient-dental text-white p-5 sm:p-8 rounded-3xl relative shadow-xl overflow-hidden mb-4 sm:mb-6">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-cyan-200">
+            {t.question || "Question"} {currentQuestion + 1} {t.of || "of"} {questions.length}
           </p>
-          <p className="text-sm text-[#64748B]">{Math.round(progress)}%</p>
+          <p className="text-xs font-extrabold text-cyan-300">{Math.round(progress)}% {t.completed || "Completed"}</p>
         </div>
-        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="w-full h-2.5 bg-white/20 rounded-full overflow-hidden backdrop-blur-md">
           <div
-            className="h-full bg-[#2D9CDB] transition-all duration-300"
+            className="h-full bg-cyan-400 transition-all duration-500 rounded-full"
             style={{ width: `${progress}%` }}
           ></div>
         </div>
       </div>
 
-      <div className="flex-1">
-        <div className="bg-gradient-to-br from-[#F2F9FF] to-white p-6 rounded-3xl border border-gray-200 mb-6">
-          <h2 className="text-xl font-bold text-[#1E293B] leading-relaxed">
+      <div className="bg-white p-4 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 sm:space-y-6">
+        <div className="p-4 sm:p-6 rounded-2xl bg-sky-50/60 border border-sky-100">
+          <h2 className="text-base sm:text-xl font-bold text-slate-900 leading-snug sm:leading-relaxed">
             {question?.question}
           </h2>
         </div>
@@ -389,37 +407,44 @@ export default function AssessmentScreen() {
             <button
               key={index}
               onClick={() => handleAnswer(option)}
-              className={`w-full p-4 rounded-2xl border-2 transition-all text-left outline-none cursor-pointer ${
+              className={`w-full p-4 sm:p-5 min-h-[48px] rounded-2xl border-2 transition-all text-left outline-none cursor-pointer flex items-center justify-between gap-3 active:scale-[0.98] ${
                 answers[currentQuestion]?.text === option.text
-                  ? "bg-[#F2F9FF] border-[#2D9CDB]"
-                  : "bg-white border-gray-200 hover:border-gray-300"
+                  ? "bg-sky-50 border-sky-500 text-sky-900 shadow-sm"
+                  : "bg-white border-slate-200/80 text-slate-800 hover:border-sky-300 hover:bg-slate-50"
               }`}
             >
-              <p className="font-medium text-[#1E293B]">{option.text}</p>
+              <span className="font-bold text-xs sm:text-sm leading-snug flex-1">{option.text}</span>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                answers[currentQuestion]?.text === option.text
+                  ? "border-sky-600 bg-sky-600 text-white"
+                  : "border-slate-300"
+              }`}>
+                {answers[currentQuestion]?.text === option.text && <div className="w-2 h-2 rounded-full bg-white"></div>}
+              </div>
             </button>
           ))}
         </div>
-      </div>
 
-      <div className="mt-8 flex gap-3">
-        {currentQuestion > 0 && (
+        <div className="pt-2 sm:pt-4 flex gap-3">
+          {currentQuestion > 0 && (
+            <button
+              onClick={handlePrevious}
+              className="px-5 sm:px-6 py-3.5 sm:py-4 min-h-[48px] rounded-2xl border-2 border-slate-200 text-slate-700 font-extrabold text-xs sm:text-sm hover:bg-slate-50 transition-colors flex items-center gap-2 cursor-pointer active:scale-95 shrink-0"
+            >
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              Previous
+            </button>
+          )}
           <button
-            onClick={handlePrevious}
-            className="px-6 py-4 rounded-2xl border-2 border-[#0F4C81] text-[#0F4C81] font-medium hover:bg-[#F2F9FF] transition-colors flex items-center gap-2 cursor-pointer"
+            onClick={handleNext}
+            disabled={!answers[currentQuestion]}
+            className="flex-1 py-3.5 sm:py-4 min-h-[48px] rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-xs sm:text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-600/20 active:scale-95"
           >
-            <ChevronLeft className="w-5 h-5" />
-            Previous
+            <span>{currentQuestion < questions.length - 1 ? "Next Question" : "View Clinical Results"}</span>
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
-        )}
-        <button
-          onClick={handleNext}
-          disabled={!answers[currentQuestion]}
-          className="flex-1 py-4 rounded-2xl bg-[#0F4C81] text-white font-medium hover:bg-[#0F4C81]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-        >
-          {currentQuestion < questions.length - 1 ? "Next Question" : "View Results"}
-          <ChevronRight className="w-5 h-5" />
-        </button>
+        </div>
       </div>
     </div>
   );
-}
+}

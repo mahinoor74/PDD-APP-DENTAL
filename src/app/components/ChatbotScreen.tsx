@@ -1,48 +1,69 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Send, Bot, User as UserIcon, ArrowLeft } from "lucide-react";
+import { Send, Bot, User as UserIcon, ArrowLeft, Sparkles, RefreshCw, Smile, Shield } from "lucide-react";
+import { API_BASE_URL, fetchApiResilient } from "./apiService";
 
 type Message = {
   id: number;
   text: string;
   sender: "user" | "bot";
   timestamp: Date;
+  chips?: string[];
 };
 
 const quickReplies = [
-  "How do I reduce sensitivity?",
-  "Best toothpaste for whitening?",
-  "Bass technique tutorial",
-  "Tips for flossing",
+  "How to reduce tooth sensitivity?",
+  "Why do my gums bleed?",
+  "Modified Bass technique guide",
+  "Electric vs manual brush",
+  "Toothache emergency tips",
+  "Braces & aligner cleaning",
+  "Teeth whitening safety",
+  "Flossing best practices",
 ];
 
-// Dynamically routes requests through your active network IP address host
-const API_BASE = "http://10.127.81.158:8000";
+function renderFormattedMessage(text: string) {
+  const lines = text.split("\n");
+  return lines.map((line, lineIdx) => {
+    const parts = line.split(/(\*\*.*?\*\*)/g);
+    const lineContent = parts.map((part, partIdx) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return (
+          <strong key={partIdx} className="font-bold text-slate-900 dark:text-white">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return part;
+    });
+
+    return (
+      <React.Fragment key={lineIdx}>
+        {lineContent}
+        {lineIdx < lines.length - 1 && <br />}
+      </React.Fragment>
+    );
+  });
+}
 
 export default function ChatbotScreen() {
   const navigate = useNavigate();
-  const language = "English";
 
-  // Safe username initializer that handles blank or corrupted storage states gracefully
-  const [userName, setUserName] = useState(() => {
+  const [userName] = useState(() => {
     try {
       const activeSession = localStorage.getItem("user_session");
       if (activeSession && activeSession.trim().startsWith("{")) {
         const parsed = JSON.parse(activeSession);
         if (parsed && parsed.name) return parsed.name;
       }
-    } catch (e) {
-      console.warn("Handled standard session boundary check:", e);
-    }
-    
-    // Smooth fallback to singular text parameters if dictionary block is blank
-    return localStorage.getItem("userName") || "Mahin";
+    } catch (e) {}
+    return localStorage.getItem("userName") || "ToothMate User";
   });
 
   const initialMessages: Message[] = [
     {
       id: 1,
-      text: `Hello ${userName}! I'm your virtual dental assistant chatbot. How can I help you today?`,
+      text: `Hello ${userName}! 👋 I'm Dr. Minty, your AI Dental Coach powered by Gemini. Ask me any question about your teeth, brushing techniques, sensitivity, or oral health!`,
       sender: "bot",
       timestamp: new Date(),
     },
@@ -61,7 +82,6 @@ export default function ChatbotScreen() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  // Unified submission pathway handles button taps and key returns smoothly
   const processChatSubmission = async (textToSend: string) => {
     const cleanText = textToSend ? String(textToSend).trim() : "";
     if (!cleanText) return;
@@ -80,7 +100,7 @@ export default function ChatbotScreen() {
     setIsTyping(true);
 
     try {
-      const response = await fetch(`${API_BASE}/api/chat`, {
+      const response = await fetchApiResilient('/chat', {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -88,94 +108,141 @@ export default function ChatbotScreen() {
         },
         body: JSON.stringify({ 
           message: cleanText,
-          lang: language 
+          lang: "English" 
         }),
       });
 
-      if (!response.ok) throw new Error("Server communication fault block caught.");
+      if (!response.ok) throw new Error("Chat server error");
       
       const data = await response.json();
       const botReplyText = data.response || data.text || "Response processed successfully.";
+      const newChips = data.followUpChips || [];
 
       const botMessage: Message = {
         id: nextIdBase + 1,
         text: botReplyText,
         sender: "bot",
         timestamp: new Date(),
+        chips: newChips,
       };
       setMessages((prev) => [...prev, botMessage]);
-
     } catch (error) {
-      console.error("Local network catch activated:", error);
-      
-      // Smart presentation backup response generator ensures an answer prints instantly
-      let fallbackReply = "That is an excellent oral hygiene question! To keep your dental health optimal, make sure to log your brushing sessions twice a day on your dashboard and keep your custom reminders active!";
-      const msgLower = cleanText.toLowerCase();
-      
-      if (msgLower.includes("sensitivity") || msgLower.includes("hurt")) {
-        fallbackReply = "For tooth sensitivity, try using a soft-bristled toothbrush, avoiding highly acidic foods, and brushing with a potassium nitrate desensitizing toothpaste.";
-      } else if (msgLower.includes("white") || msgLower.includes("toothpaste")) {
-        fallbackReply = "To maintain a bright smile safely, select an enamel-safe whitening toothpaste with mild abrasives or peroxide blends approved for daily care.";
-      } else if (msgLower.includes("bass") || msgLower.includes("technique")) {
-        fallbackReply = "For the Modified Bass technique, angle your brush bristles at 45-degrees toward the gumline, vibrate gently back and forth on the spot, then sweep away from the gums.";
-      } else if (msgLower.includes("floss")) {
-        fallbackReply = "Flossing clears out debris hidden between tight spaces! Curve the floss into a 'C' shape against the side of each tooth and gently guide it up and down beneath the margins.";
-      }
+      console.error("Chat API error:", error);
+      const fallbackText = 
+        `Hello ${userName}! I am Dr. Minty, your Senior AI Dental Coach.\n\n` +
+        `• **Brushing**: Brush twice daily for 2 minutes using a soft toothbrush at a 45° angle (Modified Bass technique).\n` +
+        `• **Flossing**: Floss once daily before bed to clear plaque between teeth.\n` +
+        `• **Advice**: For bleeding gums, sensitivity, or toothache, ask me specific questions or check our app feature guide!`;
 
-      const botMessage: Message = {
-        id: nextIdBase + 2,
-        text: fallbackReply,
+      const errorMessage: Message = {
+        id: nextIdBase + 1,
+        text: fallbackText,
         sender: "bot",
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, botMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
     }
   };
 
+  const handleResetChat = () => {
+    setMessages(initialMessages);
+  };
+
   return (
-    <div className="w-full max-w-md mx-auto h-[calc(100vh-40px)] flex flex-col bg-white font-sans overflow-hidden relative shadow-2xl">
+    <div className="w-full flex flex-col h-full min-h-[500px] bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden font-sans relative flex-1">
       
-      {/* HEADER BAR */}
-      <div className="bg-gradient-to-r from-[#0F4C81] to-[#2D9CDB] text-white p-4 flex items-center gap-3 shadow-md shrink-0">
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center cursor-pointer shrink-0"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </button>
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="relative shrink-0">
-            <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center">
-              <Bot className="w-6 h-6 text-[#2D9CDB]" />
+      {/* Sleek Mobile Header */}
+      <div className="bg-gradient-to-r from-sky-700 via-teal-700 to-cyan-600 text-white px-4 py-3.5 flex items-center justify-between shadow-md shrink-0">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="w-9 h-9 min-h-[44px] min-w-[44px] rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center cursor-pointer transition-all"
+            aria-label="Back to dashboard"
+          >
+            <ArrowLeft className="w-4 h-4 text-white" />
+          </button>
+          
+          <div className="relative">
+            <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-sm">
+              <Bot className="w-5 h-5 text-cyan-200" />
             </div>
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+            <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-sky-800 rounded-full animate-pulse"></span>
           </div>
-          <div className="min-w-0">
-            <h2 className="font-bold text-sm truncate">Dental Chatbot</h2>
-            <p className="text-[10px] text-white/80">Online Smart Assistant</p>
+
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h2 className="font-extrabold text-sm tracking-tight text-white">Dr. Minty AI</h2>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-400/20 text-cyan-200 border border-cyan-300/30">
+                ACTIVE COACH
+              </span>
+            </div>
+            <p className="text-[11px] text-sky-100/90 font-medium">Virtual Dental Assistant • Online</p>
           </div>
         </div>
+
+        <button
+          onClick={handleResetChat}
+          className="px-3 py-2 min-h-[44px] rounded-xl bg-white/10 hover:bg-white/20 text-sky-100 text-xs font-semibold flex items-center gap-1 cursor-pointer transition-all active:scale-95"
+          title="Reset conversation"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Reset</span>
+        </button>
       </div>
 
-      {/* CHAT MESSAGES PANEL */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
+      {/* Quick Prompt Chips (Horizontal Scrollable) */}
+      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md px-3 py-2.5 border-b border-slate-200/60 dark:border-slate-700/60 shrink-0 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-2">
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-sky-500" /> Quick Ask:
+        </span>
+        {quickReplies.map((reply, idx) => (
+          <button
+            key={idx}
+            onClick={() => processChatSubmission(reply)}
+            className="inline-flex items-center px-3.5 py-2 min-h-[44px] rounded-full bg-sky-50 dark:bg-slate-700/80 text-sky-700 dark:text-sky-300 hover:bg-sky-600 hover:text-white dark:hover:bg-sky-500 text-xs font-semibold border border-sky-200/80 dark:border-slate-600 transition-all cursor-pointer shrink-0 active:scale-95 shadow-xs"
+          >
+            {reply}
+          </button>
+        ))}
+      </div>
+
+      {/* Scrollable Message History Area */}
+      <div className="flex-1 overflow-y-auto p-3.5 md:p-5 space-y-3.5 bg-slate-50/50 dark:bg-slate-900/50">
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex gap-2.5 ${message.sender === "user" ? "flex-row-reverse" : "flex-row"}`}
           >
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-              message.sender === "user" ? "bg-[#0F4C81]" : "bg-[#F2F9FF] border border-[#2D9CDB]"
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-xs ${
+              message.sender === "user" ? "bg-sky-600 text-white" : "bg-white dark:bg-slate-800 text-teal-600 dark:text-cyan-400 border border-slate-200 dark:border-slate-700"
             }`}>
-              {message.sender === "user" ? <UserIcon className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-[#2D9CDB]" />}
+              {message.sender === "user" ? <UserIcon className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
             </div>
-            <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
-              message.sender === "user" ? "bg-[#0F4C81] text-white rounded-tr-sm" : "bg-slate-50 text-[#1E293B] border border-slate-100 rounded-tl-sm"
+
+            <div className={`max-w-[88%] sm:max-w-[78%] rounded-2xl px-4 py-3 shadow-xs ${
+              message.sender === "user" 
+                ? "bg-sky-600 text-white rounded-tr-xs" 
+                : "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700/80 rounded-tl-xs"
             }`}>
-              <p className="text-xs font-semibold whitespace-pre-line leading-relaxed">{message.text}</p>
-              <p className={`text-[9px] mt-1 text-right ${message.sender === "user" ? "text-white/60" : "text-[#64748B]"}`}>
+              <div className="text-xs md:text-sm font-medium leading-relaxed">
+                {message.sender === "bot" ? renderFormattedMessage(message.text) : message.text}
+              </div>
+              {message.sender === "bot" && message.chips && message.chips.length > 0 && (
+                <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex flex-wrap gap-1.5">
+                  {message.chips.map((chip, chipIdx) => (
+                    <button
+                      key={chipIdx}
+                      onClick={() => processChatSubmission(chip)}
+                      className="px-3 py-1.5 min-h-[38px] rounded-full bg-sky-50 dark:bg-slate-700 text-sky-700 dark:text-sky-300 hover:bg-sky-600 hover:text-white text-[11px] font-semibold border border-sky-200/60 dark:border-slate-600 transition-all cursor-pointer active:scale-95"
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <p className={`text-[9px] mt-1 font-semibold text-right ${message.sender === "user" ? "text-sky-200" : "text-slate-400 dark:text-slate-500"}`}>
                 {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </p>
             </div>
@@ -184,55 +251,38 @@ export default function ChatbotScreen() {
 
         {isTyping && (
           <div className="flex gap-2.5 flex-row items-center">
-            <div className="w-7 h-7 rounded-full bg-[#F2F9FF] border border-[#2D9CDB] flex items-center justify-center flex-shrink-0 animate-pulse">
-              <Bot className="w-3.5 h-3.5 text-[#2D9CDB]" />
+            <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 shadow-xs">
+              <Bot className="w-4 h-4 text-sky-600 dark:text-cyan-400 animate-spin" />
             </div>
-            <div className="bg-slate-50 border border-slate-100 px-3 py-2 rounded-2xl rounded-tl-sm text-slate-400 text-xs font-bold animate-pulse">
-              Chatbot is evaluating...
+            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 px-3.5 py-2.5 rounded-2xl rounded-tl-xs text-slate-500 dark:text-slate-400 text-xs font-semibold animate-pulse shadow-xs flex items-center gap-1.5">
+              <span>Dr. Minty is analyzing</span>
+              <span className="w-1.5 h-1.5 bg-sky-500 rounded-full animate-bounce"></span>
+              <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+              <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* QUICK REPLIES BAR */}
-      <div className="px-4 py-2 bg-white border-t border-slate-50 shrink-0">
-        <div className="flex flex-wrap gap-1.5 max-w-full">
-          {quickReplies.map((reply, index) => (
-            <button
-              key={index}
-              onClick={() => processChatSubmission(reply)}
-              className="px-3 py-1.5 rounded-full bg-[#F2F9FF] text-[#0F4C81] text-[11px] font-bold border border-[#2D9CDB]/20 hover:bg-[#2D9CDB] hover:text-white transition-all cursor-pointer whitespace-nowrap"
-            >
-              {reply}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* INPUT CONSOLE BAR */}
-      <div className="p-4 bg-white border-t border-slate-100 flex gap-2 items-center shrink-0 w-full">
+      {/* Fixed Bottom Input Bar with 48px Min Height */}
+      <form onSubmit={(e) => { e.preventDefault(); processChatSubmission(inputText); }} className="p-3 bg-white dark:bg-slate-800 border-t border-slate-200/80 dark:border-slate-700/80 flex gap-2 items-center shrink-0">
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              processChatSubmission(inputText);
-            }
-          }}
-          placeholder="Ask a dental question..."
-          className="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#2D9CDB] focus:bg-white transition-all"
+          placeholder="Ask Dr. Minty a dental question..."
+          className="flex-1 px-4 py-3 min-h-[48px] rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-900 transition-all placeholder:text-slate-400"
         />
         <button
-          onClick={() => processChatSubmission(inputText)}
+          type="submit"
           disabled={!inputText.trim()}
-          className="w-10 h-10 rounded-xl bg-[#0F4C81] text-white flex items-center justify-center hover:bg-[#0F4C81]/90 transition-colors disabled:opacity-40 shrink-0 cursor-pointer shadow-xs"
+          className="w-12 h-12 min-h-[48px] min-w-[48px] rounded-2xl bg-sky-600 hover:bg-sky-500 text-white flex items-center justify-center transition-all disabled:opacity-40 shrink-0 cursor-pointer shadow-md shadow-sky-600/20 active:scale-95"
+          aria-label="Send message"
         >
           <Send className="w-4 h-4 fill-white" />
         </button>
-      </div>
+      </form>
 
     </div>
   );

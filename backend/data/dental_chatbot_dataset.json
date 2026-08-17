@@ -1,0 +1,426 @@
+[
+  {
+    "category": "greetings",
+    "queries": [
+      "hi",
+      "hello",
+      "hey",
+      "hlo",
+      "hlw",
+      "hii",
+      "helo",
+      "heyy",
+      "yo",
+      "hola",
+      "namaste",
+      "hi doctor",
+      "hello dr minty",
+      "hey doc"
+    ],
+    "response": "Hello! I am Dr. Minty, your Senior AI Dental Coach. How can I assist you with your teeth, brushing habits, or oral hygiene today?",
+    "followUpChips": [
+      "How to reduce tooth sensitivity?",
+      "Why do my gums bleed?",
+      "Modified Bass technique guide"
+    ]
+  },
+  {
+    "category": "good_morning",
+    "queries": [
+      "good morning",
+      "gm",
+      "goodmrng",
+      "morning doc",
+      "good morning doctor"
+    ],
+    "response": "Good morning! ☀️ Don't forget your morning 2-minute brushing session with soft bristles at a 45° angle. How can I help your smile today?",
+    "followUpChips": [
+      "Modified Bass technique guide",
+      "Electric vs manual brush",
+      "Toothpaste types guide"
+    ]
+  },
+  {
+    "category": "good_night",
+    "queries": [
+      "good night",
+      "gn",
+      "goodnight",
+      "night doc",
+      "good night doctor"
+    ],
+    "response": "Good night! 🌙 Make sure to brush for 2 minutes and floss thoroughly before going to sleep to prevent overnight plaque buildup!",
+    "followUpChips": [
+      "Flossing best practices",
+      "Why do my gums bleed?",
+      "Mouthwash recommendations"
+    ]
+  },
+  {
+    "category": "identity",
+    "queries": [
+      "who are you",
+      "who u",
+      "what is your name",
+      "tell me about yourself",
+      "are you a dentist",
+      "whos this"
+    ],
+    "response": "I am Dr. Minty, your virtual Senior Oral Dentist AI. I provide evidence-based clinical guidance on brushing techniques, tooth sensitivity, gum health, root canals, braces, extractions, whitening, and emergency dental care.",
+    "followUpChips": [
+      "What can you do?",
+      "How to log brushing",
+      "Modified Bass technique guide"
+    ]
+  },
+  {
+    "category": "capabilities",
+    "queries": [
+      "what can you do",
+      "what u do",
+      "how can you help me",
+      "what are your features",
+      "capabilities",
+      "help me"
+    ],
+    "response": "I can assist you with:\n\n1. **Clinical Advice**: Diagnosing tooth sensitivity, bleeding gums, toothaches, cavities, and root canals.\n2. **Brushing Techniques**: Teaching Modified Bass, Stillman, Charters for braces, and Fones methods.\n3. **Toothpaste & Products**: Recommending stannous fluoride, potassium nitrate, and whitening care.\n4. **App Features**: Guiding you on logging brushing sessions, tracking habit stats, setting reminders, and viewing prescriptions.",
+    "followUpChips": [
+      "How to log brushing",
+      "Toothpaste types guide",
+      "Toothache emergency tips"
+    ]
+  },
+  {
+    "category": "gratitude",
+    "queries": [
+      "thank you",
+      "thanks",
+      "tq",
+      "thx",
+      "thank u doc",
+      "thanks doctor",
+      "great advice"
+    ],
+    "response": "You are very welcome! Keep up your 2-minute brushing routine twice daily and daily flossing for a healthy, confident smile!",
+    "followUpChips": [
+      "Modified Bass technique guide",
+      "Flossing best practices",
+      "Where are my habit stats"
+    ]
+  },
+  {
+    "category": "farewell",
+    "queries": [
+      "bye",
+      "goodbye",
+      "byee",
+      "see you",
+      "cya",
+      "bye doc",
+      "talk to you later"
+    ],
+    "response": "Goodbye! Take great care of your teeth, brush twice daily, and don't forget to visit your physical dentist for regular checkups!",
+    "followUpChips": [
+      "How do reminders work",
+      "How to log brushing",
+      "Habit stats guide"
+    ]
+  },
+  {
+    "category": "app_log_brushing",
+    "queries": [
+      "how to log brushing",
+      "how do I log my brushing",
+      "start brushing timer",
+      "record brushing session",
+      "log my brush",
+      "brushing tracker"
+    ],
+    "response": "To log your brushing session in ToothMate:\n\n1. **Dashboard**: Navigate to the **Home / Dashboard** screen.\n2. **Start Session**: Click the large **'Start 2-Min Brushing'** timer button.\n3. **Guided Brushing**: Follow the 4-quadrant visual guide as the timer runs for 2 minutes.\n4. **Completion**: Once finished, your session is automatically saved to your streak stats!",
+    "followUpChips": [
+      "Where are my habit stats",
+      "How do reminders work",
+      "Modified Bass technique guide"
+    ]
+  },
+  {
+    "category": "app_habit_stats",
+    "queries": [
+      "where are my habit stats",
+      "how to view stats",
+      "my brushing streak",
+      "show my progress",
+      "analytics",
+      "history"
+    ],
+    "response": "To view your brushing habit stats and streak progress:\n\n1. Go to the **Dashboard** or **Analytics** tab.\n2. View your **Current Streak (Days)**, **Total Sessions Logged**, and **Morning vs Evening Consistency**.\n3. Check your weekly compliance calendar to ensure 100% oral hygiene consistency!",
+    "followUpChips": [
+      "How to log brushing",
+      "How do reminders work",
+      "How do assessments work"
+    ]
+  },
+  {
+    "category": "app_reminders",
+    "queries": [
+      "how do reminders work",
+      "set brushing alarm",
+      "change reminder time",
+      "morning alarm",
+      "night alarm",
+      "notifications"
+    ],
+    "response": "ToothMate sends push notifications for your morning and evening brushing sessions:\n\n1. Open your **Profile / Settings** screen.\n2. Tap **'Brushing Reminders'**.\n3. Set your preferred **Morning Alarm Time** (e.g., 08:00 AM) and **Night Alarm Time** (e.g., 10:00 PM).\n4. Save settings to receive timely daily reminders!",
+    "followUpChips": [
+      "How to change profile",
+      "How to log brushing",
+      "Where are my habit stats"
+    ]
+  },
+  {
+    "category": "app_profile",
+    "queries": [
+      "how to change profile",
+      "edit my profile",
+      "update personal info",
+      "change age group",
+      "change name"
+    ],
+    "response": "To update your personal profile in ToothMate:\n\n1. Tap the **Profile / Avatar** icon in the navigation bar.\n2. Tap **'Edit Profile'** to update your Name, Age Group, or Gender.\n3. Click **'Save Changes'** to update your personalized oral health recommendations.",
+    "followUpChips": [
+      "How do reminders work",
+      "How to view prescriptions",
+      "How do assessments work"
+    ]
+  },
+  {
+    "category": "app_prescriptions",
+    "queries": [
+      "how to view prescriptions",
+      "where are my prescriptions",
+      "my dental doctor prescription",
+      "prescription history"
+    ],
+    "response": "You can access your dental doctor prescriptions anytime:\n\n1. Tap the **Prescriptions** icon from the bottom navigation or quick menu.\n2. View your active medication schedules, dosage instructions, and doctor notes.\n3. Tap any prescription item to set medication reminder alarms!",
+    "followUpChips": [
+      "How to change profile",
+      "Where are my habit stats",
+      "Toothache emergency tips"
+    ]
+  },
+  {
+    "category": "app_assessments",
+    "queries": [
+      "how do assessments work",
+      "take oral assessment",
+      "dental score",
+      "check my dental health",
+      "risk score"
+    ],
+    "response": "ToothMate's AI Assessment evaluates your oral health risk in 10 seconds:\n\n1. Go to the **Assessment** tab.\n2. Answer a few simple questions about sensitivity, bleeding, and habits.\n3. Receive your personalized **Oral Health Risk Score** and recommended dental care routine!",
+    "followUpChips": [
+      "Why do my gums bleed?",
+      "How to reduce tooth sensitivity?",
+      "Toothpaste types guide"
+    ]
+  },
+  {
+    "category": "toothpaste_types",
+    "queries": [
+      "toothpaste types",
+      "what toothpaste should I use",
+      "best toothpaste for bleeding gums",
+      "toothpaste for sensitivity",
+      "stannous fluoride vs sodium fluoride",
+      "whitening toothpaste",
+      "hydroxyapatite toothpaste"
+    ],
+    "response": "Clinical Guide to Toothpaste Ingredients:\n\n• **Bleeding Gums / Gingivitis**: Use **Stannous Fluoride (SnF2)** toothpaste (e.g., Parodontax, Crest Pro-Health) which kills plaque bacteria along the gumline.\n• **Sensitive Teeth**: Use **Potassium Nitrate** toothpaste (e.g., Sensodyne) which calms nerve signals inside dentin tubules.\n• **Cavity Prevention**: Look for 1450 ppm **Fluoride** or **Nano-Hydroxyapatite (nHAp)** to remineralize enamel.\n• **Whitening**: Choose low-abrasivity silica formulas to avoid wearing down tooth enamel.",
+    "followUpChips": [
+      "How to reduce tooth sensitivity?",
+      "Why do my gums bleed?",
+      "Modified Bass technique guide"
+    ]
+  },
+  {
+    "category": "bass_technique",
+    "queries": [
+      "modified bass technique",
+      "how to brush teeth properly",
+      "brushing technique",
+      "bass method steps",
+      "brushing duration",
+      "brushing pressure"
+    ],
+    "response": "The **Modified Bass Technique** is the gold standard method recommended by periodontists worldwide:\n\n1. **Angle**: Place toothbrush bristles at a **45-degree angle** pointing directly toward your gumline sulcus.\n2. **Vibrate**: Apply light pressure and execute short, gentle vibratory circular motions for 10 seconds per 2-3 teeth.\n3. **Sweep**: Firmly roll/sweep the brush head away from the gums toward the chewing surface to sweep out dislodged plaque.\n4. **Duration & Frequency**: Spend 2 full minutes twice daily.",
+    "followUpChips": [
+      "Electric vs manual brush",
+      "Toothpaste types guide",
+      "Why do my gums bleed?"
+    ]
+  },
+  {
+    "category": "electric_vs_manual",
+    "queries": [
+      "electric vs manual brush",
+      "is electric toothbrush better",
+      "should I buy electric toothbrush",
+      "manual toothbrush tips"
+    ],
+    "response": "Electric vs Manual Toothbrush Clinical Comparison:\n\n• **Electric Toothbrushes**: Deliver 30,000 to 40,000 micro-vibrations per minute, feature built-in 2-minute timers, and pressure sensors that prevent enamel erosion. Highly recommended for braces, implants, or gum recession.\n• **Manual Toothbrushes**: Very effective if used with soft bristles and the Modified Bass technique for 2 full minutes. Replace your brush head every 3 months!",
+    "followUpChips": [
+      "Modified Bass technique guide",
+      "Toothpaste types guide",
+      "How to clean metal braces"
+    ]
+  },
+  {
+    "category": "gum_health_bleeding",
+    "queries": [
+      "why do my gums bleed",
+      "bleeding gums treatment",
+      "gingivitis symptoms",
+      "periodontitis",
+      "swollen gums",
+      "gum disease cure",
+      "flossing advice"
+    ],
+    "response": "Clinical Assessment for Bleeding Gums (Gingivitis):\n\n• **Cause**: Bacterial plaque buildup along the gumline causing localized inflammation.\n• **Action**: **DO NOT stop brushing or flossing!** Continue brushing gently with soft bristles angled at 45 degrees.\n• **Toothpaste & Rinse**: Use Stannous Fluoride toothpaste and an alcohol-free CPC antibacterial mouthwash.\n• **Flossing**: Floss daily using a C-shape curve around each tooth surface to clean under the gumline.\n• **Professional Care**: Schedule a professional dental scaling (cleaning) if bleeding persists over 7 days.",
+    "followUpChips": [
+      "Toothpaste types guide",
+      "Flossing best practices",
+      "Modified Bass technique guide"
+    ]
+  },
+  {
+    "category": "flossing_guide",
+    "queries": [
+      "flossing best practices",
+      "how to floss properly",
+      "flossing steps",
+      "water flosser vs string floss",
+      "how often to floss"
+    ],
+    "response": "Proper Flossing Routine:\n\n1. **Length**: Use 18 inches of string floss, wrapping ends around your middle fingers.\n2. **C-Shape**: Gently glide floss between teeth and hug the side of one tooth in a 'C' shape.\n3. **Motion**: Slide up and down along the tooth surface beneath the gumline.\n4. **Water Flossers**: Excellent alternative for braces or bridges to flush out interdental debris!",
+    "followUpChips": [
+      "Why do my gums bleed?",
+      "Modified Bass technique guide",
+      "How to clean metal braces"
+    ]
+  },
+  {
+    "category": "tooth_sensitivity",
+    "queries": [
+      "how to reduce tooth sensitivity",
+      "cold water hurts teeth",
+      "sensitive teeth remedies",
+      "hot cold tooth pain",
+      "exposed dentin",
+      "enamel wear"
+    ],
+    "response": "Clinical Assessment for Tooth Sensitivity:\n\n• **Cause**: Exposed dentin tubules due to enamel erosion, aggressive scrubbing, or gum recession.\n• **Immediate Relief**: Use **Potassium Nitrate (Sensodyne)** toothpaste twice daily. Do not rinse with water immediately after brushing so active minerals remain on teeth.\n• **Brushing Habit**: Switch to an ultra-soft toothbrush and avoid hard horizontal scrubbing.\n• **Clinical Care**: Visit your dentist for professional fluoride varnish or bonding if pain persists.",
+    "followUpChips": [
+      "Toothpaste types guide",
+      "Modified Bass technique guide",
+      "Toothache emergency tips"
+    ]
+  },
+  {
+    "category": "toothache_emergency",
+    "queries": [
+      "toothache emergency tips",
+      "severe tooth pain",
+      "throbbing toothache relief",
+      "home remedy for toothache",
+      "cavity pain relief",
+      "tooth abscess pain"
+    ],
+    "response": "Emergency First Aid for Severe Toothache:\n\n1. **Rinse**: Swish warm salt water (1/2 tsp salt in warm water) to clean bacteria and soothe inflammation.\n2. **Floss**: Gently floss around the painful tooth to remove trapped food particles.\n3. **Pain Relief**: Take over-the-counter pain relievers (Ibuprofen or Acetaminophen) as directed. **Never place aspirin directly against your gums!**\n4. **Cold Compress**: Apply an ice pack outside your cheek for 15 minutes.\n5. **Dental Visit**: Schedule an immediate dental evaluation if pain is accompanied by facial swelling or fever.",
+    "followUpChips": [
+      "What is root canal treatment",
+      "How to reduce tooth sensitivity?",
+      "Why do my gums bleed?"
+    ]
+  },
+  {
+    "category": "root_canal",
+    "queries": [
+      "what is root canal treatment",
+      "rct process",
+      "is root canal painful",
+      "do I need root canal",
+      "infected tooth nerve",
+      "tooth crown after rct"
+    ],
+    "response": "Senior Clinical Explanation of Root Canal Treatment (RCT):\n\n1. **Purpose**: Saves a severely decayed or infected tooth by removing inflamed nerve tissue inside root canals.\n2. **Pain Management**: Performed under local anesthesia — the procedure is **completely painless**!\n3. **Steps**: The dentist cleans, disinfects, and seals the canals with Gutta-Percha, then places a protective dental crown.\n4. **Recovery**: Mild post-procedure tenderness resolves in 2-3 days with standard OTC pain relievers.",
+    "followUpChips": [
+      "Toothache emergency tips",
+      "Toothpaste types guide",
+      "Modified Bass technique guide"
+    ]
+  },
+  {
+    "category": "braces_orthodontics",
+    "queries": [
+      "braces aligner cleaning",
+      "how to clean metal braces",
+      "invisalign aligner care",
+      "sore teeth after braces tightening",
+      "poking braces wire",
+      "retainer cleaning"
+    ],
+    "response": "Orthodontic & Appliance Care Guide:\n\n• **Braces Hygiene**: Brush using **Charters Technique** (bristles angled toward brackets). Use interdental proxy brushes under archwires.\n• **Poking Wires**: Place orthodontic relief wax over sharp wire tips to protect cheek tissue.\n• **Aligners / Retainers**: Clean aligners with lukewarm water and a soft toothbrush daily. **Never use hot water** as it warps plastic!",
+    "followUpChips": [
+      "Flossing best practices",
+      "Modified Bass technique guide",
+      "Electric vs manual brush"
+    ]
+  },
+  {
+    "category": "special_care_kids_seniors",
+    "queries": [
+      "pediatric dental care",
+      "teething infant care",
+      "senior oral care",
+      "denture cleaning guide",
+      "dry mouth xerostomia"
+    ],
+    "response": "Special Population Oral Care Guidelines:\n\n• **Pediatric Care**: Use a rice-sized smear of fluoride toothpaste for infants under 3, and a pea-sized amount for children 3-6. Practice Fones circular brushing.\n• **Senior Care**: Dentures must be removed overnight and brushed with denture cleanser (not regular toothpaste). Drink water frequently to manage dry mouth (xerostomia).",
+    "followUpChips": [
+      "Modified Bass technique guide",
+      "Toothpaste types guide",
+      "Why do my gums bleed?"
+    ]
+  },
+  {
+    "category": "whitening_care",
+    "queries": [
+      "teeth whitening safety",
+      "how to whiten teeth safely",
+      "best teeth whitening",
+      "bleaching sensitivity",
+      "natural teeth whitening"
+    ],
+    "response": "Teeth Whitening Safety Guidelines:\n\n1. **Hydrogen Peroxide**: In-office or custom dental tray bleaching is safest for enamel.\n2. **Avoid Scrubbing**: Do not use harsh charcoal abrasives which scrape away healthy enamel.\n3. **Sensitivity Care**: Use Potassium Nitrate desensitizing toothpaste before and after whitening treatments.",
+    "followUpChips": [
+      "How to reduce tooth sensitivity?",
+      "Toothpaste types guide",
+      "Modified Bass technique guide"
+    ]
+  },
+  {
+    "category": "catch_all_fallback",
+    "queries": [
+      "catch all fallback",
+      "unrecognized query",
+      "random topic",
+      "default answer"
+    ],
+    "response": "I am Dr. Minty, your virtual Senior Oral Dentist AI. While I am specialized in oral health and ToothMate app guidance, here are key clinical rules for a healthy smile:\n\n• **Brushing**: Brush twice daily for 2 minutes using soft bristles angled at 45° (Modified Bass technique).\n• **Flossing**: Floss once daily before bed to clear plaque between teeth.\n• **App Features**: Use ToothMate to log brushing sessions, track habits, and schedule daily alarms!\n\nFeel free to ask me specifically about **sensitivity, bleeding gums, root canals, braces, whitening, or brushing techniques**!",
+    "followUpChips": [
+      "How to reduce tooth sensitivity?",
+      "Why do my gums bleed?",
+      "Modified Bass technique guide"
+    ]
+  }
+]

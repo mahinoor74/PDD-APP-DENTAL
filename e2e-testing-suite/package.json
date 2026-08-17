@@ -1,0 +1,17 @@
+{
+  "name": "toothmate-e2e-testing-suite",
+  "version": "1.0.0",
+  "description": "Comprehensive 300+ Testcase E2E Selenium Web & Appium Mobile Testing Suite for ToothMate with Excel Analysis Reporting",
+  "main": "runner.js",
+  "type": "module",
+  "scripts": {
+    "test": "node runner.js",
+    "test:selenium": "node runner.js --mode=selenium",
+    "test:appium": "node runner.js --mode=appium",
+    "generate:report": "node runner.js --report-only"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "selenium-webdriver": "^4.28.1"
+  }
+}

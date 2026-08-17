@@ -1,0 +1,13 @@
+{
+  "name": "toothmate-master-qa-suite",
+  "version": "1.0.0",
+  "description": "Master QA Execution Engine & Deployable Status Executive Dashboard Generator for ToothMate",
+  "main": "runner.js",
+  "type": "module",
+  "scripts": {
+    "test:all": "node runner.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}

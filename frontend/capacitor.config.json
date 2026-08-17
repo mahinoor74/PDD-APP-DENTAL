@@ -1,0 +1,8 @@
+{
+  "appId": "com.toothmate.app",
+  "appName": "ToothMate",
+  "webDir": "dist",
+  "server": {
+    "cleartext": true
+  }
+}

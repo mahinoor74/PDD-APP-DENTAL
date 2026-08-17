@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Sparkles } from "lucide-react";
-
-// 🛠️ NETWORK CONTEXT MATRIX: Dynamically routes requests through your active localhost engine host
-const API_BASE_URL = "http://localhost:8000/api";
+import { Eye, EyeOff, Sparkles, ShieldCheck, Camera, MessageSquare, Bell, ArrowRight, User, Mail, Lock, Server } from "lucide-react";
+import { API_BASE_URL, fetchApiResilient, setCustomBackendIp, DETECTED_PC_IP } from "./apiService";
 
 export default function AuthScreen() {
   const navigate = useNavigate();
@@ -11,12 +9,23 @@ export default function AuthScreen() {
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("smahinoor376@gmail.com");
+  const [password, setPassword] = useState("1234567");
   
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+
+  // Server IP Override toggle for mobile phone network connections
+  const [showIpConfig, setShowIpConfig] = useState(false);
+  const [customIpInput, setCustomIpInput] = useState(() => localStorage.getItem("custom_backend_ip") || DETECTED_PC_IP);
+
+  const handleSaveCustomIp = () => {
+    setCustomBackendIp(customIpInput);
+    setShowIpConfig(false);
+    setMessage(`Updated Backend IP target to: http://${customIpInput.trim() || 'localhost'}:8000/api`);
+    setIsError(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,15 +36,14 @@ export default function AuthScreen() {
     // ACTION A: SUBMIT SIGN UP
     if (mode === "signup") {
       try {
-        // 🚀 FIX: Corrected variable call from API_BASE to API_BASE_URL
-        const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+        const response = await fetchApiResilient(`/auth/signup`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email,
+            email: email.trim(),
             password,
             profile: {
-              name,
+              name: name.trim() || "User",
               ageGroup: "Adult",
               gender: "Not specified"
             }
@@ -50,31 +58,29 @@ export default function AuthScreen() {
           setMessage(data.detail || "Sign up failed.");
         } else if (data.success) {
           setIsError(false);
-          setMessage(data.message || "Verification email sent! Check your inbox.");
+          setMessage(data.message || "Account registered successfully! You can now log in.");
           
           if (data.user && data.user.id) {
             localStorage.setItem("user_session", JSON.stringify(data.user));
             localStorage.setItem("userId", data.user.id.toString());
             localStorage.setItem("userName", data.user.name || name);
           }
-          setName("");
-          setPassword("");
+          setMode("login");
         }
-      } catch (err) {
+      } catch (err: any) {
         setIsLoading(false);
         setIsError(true);
-        setMessage("Backend offline. Ensure FastAPI is running on Port 8000!");
+        setMessage("Unable to reach backend server. Ensure Uvicorn is running on Port 8000. On physical phones, turn off 5G Mobile Data to use Wi-Fi, or tap 'Set IP'.");
       }
     }
 
     // ACTION B: SUBMIT LOGIN VERIFICATION
     if (mode === "login") {
       try {
-        // 🚀 FIX: Corrected variable call from API_BASE to API_BASE_URL
-        const response = await fetch(`${API_BASE_URL}/auth/signin`, {
+        const response = await fetchApiResilient(`/auth/signin`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email: email.trim(), password }),
         });
 
         const data = await response.json();
@@ -84,14 +90,13 @@ export default function AuthScreen() {
           setIsError(true);
           setMessage(data.detail || "Invalid email or password.");
         } else if (data.success && data.user) {
-          // Store both standard string references and dictionary definitions safely
           localStorage.setItem("user_session", JSON.stringify(data.user));
           localStorage.setItem("userId", String(data.user.id));
           localStorage.setItem("userName", String(data.user.name));
+          localStorage.setItem("userEmail", String(data.user.email));
           
           setIsLoading(false);
           
-          // Route immediately using the completed boarding check flags
           if (data.user.hasCompletedOnboarding === true) {
             navigate("/dashboard");
           } else {
@@ -100,20 +105,19 @@ export default function AuthScreen() {
         } else {
           setIsLoading(false);
           setIsError(true);
-          setMessage("Invalid database payload configuration structure encountered.");
+          setMessage("Invalid response payload structure from server.");
         }
-      } catch (err) {
+      } catch (err: any) {
         setIsLoading(false);
         setIsError(true);
-        setMessage("Backend unreachable. Ensure server is running with --host 0.0.0.0");
+        setMessage("Unable to reach backend server. Ensure Uvicorn is running on Port 8000. On physical phones, turn off 5G Mobile Data to use Wi-Fi, or tap 'Set IP'.");
       }
     }
 
     // ACTION C: PASSWORD RECOVERY DISPATCH
     if (mode === "forgot") {
       try {
-        // 🚀 FIX: Corrected variable call from API_BASE to API_BASE_URL
-        const response = await fetch(`${API_BASE_URL}/auth/recover`, {
+        const response = await fetchApiResilient(`/auth/recover`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: email.trim() }),
@@ -127,89 +131,291 @@ export default function AuthScreen() {
           setMessage(data.detail || "No registered profile matches this email address.");
         } else if (data.success) {
           setIsError(false);
-          setMessage("Password recovery request triggered successfully via configuration rules.");
+          setMessage("Password recovery email dispatched successfully.");
         }
-      } catch (err) {
+      } catch (err: any) {
         setIsLoading(false);
         setIsError(true);
-        setMessage("Backend offline. Ensure FastAPI is running on Port 8000!");
+        setMessage("Unable to reach backend server. Ensure Uvicorn is running on Port 8000.");
       }
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F2F9FF] flex flex-col justify-center items-center p-6 font-sans">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+    <div className="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4 md:p-8 font-sans antialiased text-slate-800">
+      
+      {/* Split-Screen Main Container Card */}
+      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[640px]">
         
-        <div className="flex items-center gap-3 mb-8 justify-center">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2D9CDB] to-[#0F4C81] flex items-center justify-center">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <h2 className="text-2xl font-black text-[#1E293B] tracking-tight">ToothMate</h2>
-        </div>
+        {/* Left Column (Hero Showcase) */}
+        <div className="hidden md:flex md:col-span-6 gradient-dental text-white p-8 md:p-10 flex-col justify-between relative overflow-hidden">
+          {/* Ambient Glow Effects */}
+          <div className="absolute -top-20 -left-20 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-teal-400/20 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-[#1E293B]">
-            {mode === "login" ? "Welcome Back" : mode === "signup" ? "Create Account" : "Recover Account"}
-          </h1>
-          <p className="text-[#64748B] text-sm mt-1">
-            {mode === "login" ? "Sign in to continue your dental journey" : mode === "signup" ? "Join ToothMate for secure dental health tracking" : "Get your credentials sent straight to your email"}
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {message && (
-            <div className={`p-4 rounded-xl text-sm font-medium border ${
-              isError ? "bg-rose-50 border-rose-100 text-rose-600" : "bg-emerald-50 border-emerald-100 text-emerald-600"
-            }`}>
-              {isError ? "⚠️ " : "✅ "} {message}
+          {/* Logo & Tagline Header */}
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md">
+                <Sparkles className="w-6 h-6 text-cyan-300" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-extrabold tracking-tight text-white">ToothMate</h1>
+                <p className="text-xs text-cyan-200 font-semibold tracking-wider uppercase">AI Dental Health Coach</p>
+              </div>
             </div>
-          )}
 
-          {mode === "signup" && (
-            <div>
-              <label className="block text-xs font-bold uppercase text-slate-600 mb-1.5">Full Name</label>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your name" className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2D9CDB]" required />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-xs font-bold uppercase text-slate-600 mb-1.5">Email Address</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your.email@example.com" className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2D9CDB]" required />
+            <h2 className="text-3xl font-extrabold leading-tight text-white mt-4">
+              Your Personal AI Assistant for Perfect Oral Hygiene.
+            </h2>
+            <p className="text-sm text-sky-100/90 font-medium mt-3 leading-relaxed">
+              Track daily brushing habits, receive personalized clinical technique guides, and consult with Dr. Minty AI assistant anytime.
+            </p>
           </div>
 
-          {mode !== "forgot" && (
-            <div>
-              <label className="block text-xs font-bold uppercase text-slate-600 mb-1.5">Password</label>
-              <div className="relative">
-                <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your account password" className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2D9CDB] pr-12" required />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B]">
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          {/* Feature Badges Grid */}
+          <div className="relative z-10 space-y-3.5 my-8">
+            <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3.5 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-cyan-400/20 flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5 text-cyan-300" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-white">Dr. Minty AI Assistant</h4>
+                <p className="text-[11px] text-sky-100/80">Real-time dental advice & recommendations</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3.5 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-teal-400/20 flex items-center justify-center shrink-0">
+                <Camera className="w-5 h-5 text-teal-300" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-white">Smart Mirror Coach</h4>
+                <p className="text-[11px] text-sky-100/80">Guided 2-minute camera technique timer</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3.5 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-emerald-400/20 flex items-center justify-center shrink-0">
+                <Bell className="w-5 h-5 text-emerald-300" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-white">Scheduled Hygiene Alarms</h4>
+                <p className="text-[11px] text-sky-100/80">Morning & night reminder notifications</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Security Footer */}
+          <div className="relative z-10 flex items-center justify-between text-xs text-sky-200/90 font-medium">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Encrypted Account Security & Private Storage</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (Form Console) */}
+        <div className="col-span-12 md:col-span-6 p-6 sm:p-10 flex flex-col justify-center bg-white relative">
+          
+          {/* Top Right Mobile Server IP Button */}
+          <button 
+            type="button"
+            onClick={() => setShowIpConfig(!showIpConfig)}
+            className="absolute top-6 right-6 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Configure PC Server IP for Mobile"
+          >
+            <Server className="w-3.5 h-3.5 text-sky-600" />
+            <span>Server IP</span>
+          </button>
+
+          {/* Collapsible Mobile Server IP Config Box */}
+          {showIpConfig && (
+            <div className="mb-6 p-4 rounded-2xl bg-sky-50 border border-sky-200 space-y-2 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-sky-900 flex items-center gap-1.5">
+                  <Server className="w-4 h-4 text-sky-600" /> PC Server IP Config (Mobile Phone)
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 leading-snug">
+                If running on a physical phone via Wi-Fi, enter your PC's Local IP address (e.g. <code>10.179.103.56</code>):
+              </p>
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  value={customIpInput} 
+                  onChange={(e) => setCustomIpInput(e.target.value)} 
+                  placeholder="e.g. 10.179.103.56" 
+                  className="flex-1 px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono outline-none"
+                />
+                <button 
+                  type="button" 
+                  onClick={handleSaveCustomIp} 
+                  className="px-3 py-2 bg-sky-600 text-white rounded-xl font-bold text-xs shadow-sm hover:bg-sky-500 cursor-pointer"
+                >
+                  Save IP
                 </button>
               </div>
             </div>
           )}
 
-          {mode === "login" && (
-            <div className="flex justify-end">
-              <button type="button" onClick={() => { setMode("forgot"); setMessage(""); }} className="text-xs font-bold text-[#2D9CDB] hover:underline cursor-pointer">Forgot Password?</button>
+          {/* Header Mobile Brand & Mode Switcher */}
+          <div className="mb-6 text-center md:text-left">
+            <div className="md:hidden flex items-center gap-2.5 justify-center mb-4">
+              <div className="w-10 h-10 rounded-xl gradient-teal flex items-center justify-center text-white shadow-md">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-extrabold text-slate-900">ToothMate</h2>
             </div>
-          )}
 
-          <button type="submit" disabled={isLoading} className="w-full mt-2 py-4 rounded-2xl bg-[#0F4C81] text-white font-bold hover:bg-[#0F4C81]/90 shadow-md transition-colors disabled:opacity-50 cursor-pointer">
-            {isLoading ? "Processing..." : mode === "login" ? "Log In" : mode === "signup" ? "Create Account & Send Mail" : "Send Password to Email"}
-          </button>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-            <div className="relative flex justify-center text-xs"><span className="px-4 bg-white text-[#64748B] uppercase tracking-wider font-bold text-[10px]">Navigation Options</span></div>
+            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+              {mode === "login" ? "Welcome Back" : mode === "signup" ? "Create Your Account" : "Recover Credentials"}
+            </h2>
+            <p className="text-xs text-slate-500 font-medium mt-1">
+              {mode === "login" 
+                ? "Sign in to access your dashboard and daily habit logs." 
+                : mode === "signup" 
+                ? "Join ToothMate for clinical technique tracking and AI care." 
+                : "Enter your registered email to receive password recovery steps."}
+            </p>
           </div>
 
-          <button type="button" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setMessage(""); }} className="w-full py-4 rounded-2xl border-2 border-[#0F4C81] text-[#0F4C81] font-bold hover:bg-[#F2F9FF] transition-colors cursor-pointer">
-            {mode === "login" ? "Switch to Create Account View" : "Already have an account? Log In"}
-          </button>
-        </form>
+          {/* Tab Selection Switches */}
+          <div className="flex bg-slate-100 p-1 rounded-2xl mb-6">
+            <button
+              type="button"
+              onClick={() => { setMode("login"); setMessage(""); }}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+                mode === "login" ? "bg-white text-sky-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMode("signup"); setMessage(""); }}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+                mode === "signup" ? "bg-white text-sky-600 shadow-sm" : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              New Account
+            </button>
+          </div>
+
+          {/* Form Controls */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            
+            {/* Status Toast Banner */}
+            {message && (
+              <div className={`p-4 rounded-2xl text-xs font-bold border transition-all ${
+                isError 
+                  ? "bg-rose-50 border-rose-200/80 text-rose-700" 
+                  : "bg-emerald-50 border-emerald-200/80 text-emerald-700"
+              }`}>
+                <div className="flex items-start justify-between gap-2">
+                  <span>{isError ? "⚠️ " : "✅ "} {message}</span>
+                  {isError && (
+                    <button 
+                      type="button" 
+                      onClick={() => setShowIpConfig(true)} 
+                      className="underline text-[11px] font-black text-rose-800 shrink-0"
+                    >
+                      Set IP
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {mode === "signup" && (
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Full Name</label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <input 
+                    type="text" 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    placeholder="Mahinoor" 
+                    className="w-full pl-11 pr-4 py-3.5 min-h-[48px] rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" 
+                    required 
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Email Address</label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <input 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  placeholder="smahinoor376@gmail.com" 
+                  className="w-full pl-11 pr-4 py-3.5 min-h-[48px] rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" 
+                  required 
+                />
+              </div>
+            </div>
+
+            {mode !== "forgot" && (
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">Password</label>
+                  {mode === "login" && (
+                    <button 
+                      type="button" 
+                      onClick={() => { setMode("forgot"); setMessage(""); }} 
+                      className="text-xs font-bold text-sky-600 hover:text-sky-700 cursor-pointer min-h-[40px] px-2 flex items-center"
+                    >
+                      Forgot?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    placeholder="••••••••••••" 
+                    className="w-full pl-11 pr-12 py-3.5 min-h-[48px] rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" 
+                    required 
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    className="absolute right-3 top-1/2 -translate-y-1/2 min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <button 
+              type="submit" 
+              disabled={isLoading} 
+              className="w-full mt-2 py-4 min-h-[48px] rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-sm tracking-wide shadow-md shadow-sky-600/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>
+                {isLoading 
+                  ? "Verifying Account..." 
+                  : mode === "login" 
+                  ? "Log In to ToothMate" 
+                  : mode === "signup" 
+                  ? "Create Account" 
+                  : "Dispatch Recovery Email"}
+              </span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+
+        </div>
+
       </div>
+
     </div>
   );
 }

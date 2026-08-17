@@ -2,16 +2,20 @@
 @import './tailwind.css';
 @import './theme.css';
 
-/* Allow the browser to handle its own scroll physics */
+/* Mobile Native Viewport Reset */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow-y: auto; /* Required for trackpad scrolling */
-  -webkit-overflow-scrolling: touch; /* Native smooth scrolling */
+  height: 100dvh;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 #root {
-  min-height: 100%;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
 }

@@ -1,0 +1,13 @@
+{
+  "name": "toothmate-uiux-testing-suite",
+  "version": "1.0.0",
+  "description": "100+ UI/UX Design System, Micro-interactions & Responsiveness Testing Suite for ToothMate Application",
+  "main": "runner.js",
+  "type": "module",
+  "scripts": {
+    "test": "node runner.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "toothmate-validation-testing-suite",
+  "version": "1.0.0",
+  "description": "100+ Validation, Input Sanitization & Security Testing Suite for ToothMate Application",
+  "main": "runner.js",
+  "type": "module",
+  "scripts": {
+    "test": "node runner.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}
