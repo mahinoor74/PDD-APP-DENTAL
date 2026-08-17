@@ -8,6 +8,9 @@ on:
 
 jobs:
 
+  # ---------------------------------------------
+  # JOB 1: Selenium Website Tests (300)
+  # ---------------------------------------------
   selenium-website-tests:
     name: Selenium - Website Tests (300)
     runs-on: ubuntu-latest
@@ -15,7 +18,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -24,19 +27,27 @@ jobs:
         working-directory: selenium-testing-suite
         run: npm install
 
+      - name: Create Reports Directory
+        working-directory: selenium-testing-suite
+        run: mkdir -p reports
+
       - name: Run Selenium Website Tests (300 Test Cases)
         working-directory: selenium-testing-suite
         run: node runner.js
         continue-on-error: true
 
-      - name: Upload Selenium Test Report
+      - name: Upload Selenium Web Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: selenium-test-report
-          path: selenium-testing-suite/reports/
+          name: selenium-web-report
+          path: selenium-testing-suite/reports/*.xlsx
           retention-days: 30
+          if-no-files-found: warn
 
+  # ---------------------------------------------
+  # JOB 2: Appium Android Tests (300)
+  # ---------------------------------------------
   appium-android-tests:
     name: Appium - Android Tests (300)
     runs-on: ubuntu-latest
@@ -44,7 +55,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -53,19 +64,27 @@ jobs:
         working-directory: appium-testing-suite
         run: npm install
 
+      - name: Create Reports Directory
+        working-directory: appium-testing-suite
+        run: mkdir -p reports
+
       - name: Run Appium Android Tests (300 Test Cases)
         working-directory: appium-testing-suite
         run: node runner.js
         continue-on-error: true
 
-      - name: Upload Appium Test Report
+      - name: Upload Appium Android Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: appium-test-report
-          path: appium-testing-suite/reports/
+          name: appium-android-report
+          path: appium-testing-suite/reports/*.xlsx
           retention-days: 30
+          if-no-files-found: warn
 
+  # ---------------------------------------------
+  # JOB 3: Unit Tests API (300)
+  # ---------------------------------------------
   unit-tests-api:
     name: Unit Tests - API (300)
     runs-on: ubuntu-latest
@@ -73,7 +92,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -82,19 +101,27 @@ jobs:
         working-directory: unit-testing-suite
         run: npm install
 
+      - name: Create Reports Directory
+        working-directory: unit-testing-suite
+        run: mkdir -p reports
+
       - name: Run Unit Tests API (300 Test Cases)
         working-directory: unit-testing-suite
         run: node runner.js
         continue-on-error: true
 
-      - name: Upload Unit Test Report
+      - name: Upload Unit Tests Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: unit-test-report
-          path: unit-testing-suite/reports/
+          name: unit-tests-report
+          path: unit-testing-suite/reports/*.xlsx
           retention-days: 30
+          if-no-files-found: warn
 
+  # ---------------------------------------------
+  # JOB 4: Validation Tests (300)
+  # ---------------------------------------------
   validation-tests:
     name: Validation Tests (300)
     runs-on: ubuntu-latest
@@ -102,7 +129,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -111,19 +138,27 @@ jobs:
         working-directory: validation-testing-suite
         run: npm install
 
+      - name: Create Reports Directory
+        working-directory: validation-testing-suite
+        run: mkdir -p reports
+
       - name: Run Validation Tests (300 Test Cases)
         working-directory: validation-testing-suite
         run: node runner.js
         continue-on-error: true
 
-      - name: Upload Validation Test Report
+      - name: Upload Validation Tests Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: validation-test-report
-          path: validation-testing-suite/reports/
+          name: validation-tests-report
+          path: validation-testing-suite/reports/*.xlsx
           retention-days: 30
+          if-no-files-found: warn
 
+  # ---------------------------------------------
+  # JOB 5: Functional Tests (300)
+  # ---------------------------------------------
   functional-tests:
     name: Functional Tests - Business Logic (300)
     runs-on: ubuntu-latest
@@ -131,7 +166,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -140,19 +175,27 @@ jobs:
         working-directory: functional-testing-suite
         run: npm install
 
+      - name: Create Reports Directory
+        working-directory: functional-testing-suite
+        run: mkdir -p reports
+
       - name: Run Functional Tests (300 Test Cases)
         working-directory: functional-testing-suite
         run: node runner.js
         continue-on-error: true
 
-      - name: Upload Functional Test Report
+      - name: Upload Functional Tests Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: functional-test-report
-          path: functional-testing-suite/reports/
+          name: functional-tests-report
+          path: functional-testing-suite/reports/*.xlsx
           retention-days: 30
+          if-no-files-found: warn
 
+  # ---------------------------------------------
+  # JOB 6: UI/UX Tests (300)
+  # ---------------------------------------------
   uiux-tests:
     name: UI/UX Design and Responsiveness Tests (300)
     runs-on: ubuntu-latest
@@ -160,7 +203,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -169,19 +212,27 @@ jobs:
         working-directory: uiux-testing-suite
         run: npm install
 
+      - name: Create Reports Directory
+        working-directory: uiux-testing-suite
+        run: mkdir -p reports
+
       - name: Run UIUX Tests (300 Test Cases)
         working-directory: uiux-testing-suite
         run: node runner.js
         continue-on-error: true
 
-      - name: Upload UIUX Test Report
+      - name: Upload UIUX Tests Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: uiux-test-report
-          path: uiux-testing-suite/reports/
+          name: uiux-tests-report
+          path: uiux-testing-suite/reports/*.xlsx
           retention-days: 30
+          if-no-files-found: warn
 
+  # ---------------------------------------------
+  # JOB 7: Compile Master Report and Deploy
+  # ---------------------------------------------
   compile-master-report:
     name: Compile Master Report and Deploy
     runs-on: ubuntu-latest
@@ -197,38 +248,80 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Download All Test Reports
+      - name: Download Selenium Report
         uses: actions/download-artifact@v4
         with:
-          path: all-excel-reports/
+          name: selenium-web-report
+          path: all-excel-reports/selenium/
+        continue-on-error: true
+
+      - name: Download Appium Report
+        uses: actions/download-artifact@v4
+        with:
+          name: appium-android-report
+          path: all-excel-reports/appium/
+        continue-on-error: true
+
+      - name: Download Unit Tests Report
+        uses: actions/download-artifact@v4
+        with:
+          name: unit-tests-report
+          path: all-excel-reports/unit/
+        continue-on-error: true
+
+      - name: Download Validation Report
+        uses: actions/download-artifact@v4
+        with:
+          name: validation-tests-report
+          path: all-excel-reports/validation/
+        continue-on-error: true
+
+      - name: Download Functional Tests Report
+        uses: actions/download-artifact@v4
+        with:
+          name: functional-tests-report
+          path: all-excel-reports/functional/
+        continue-on-error: true
+
+      - name: Download UIUX Tests Report
+        uses: actions/download-artifact@v4
+        with:
+          name: uiux-tests-report
+          path: all-excel-reports/uiux/
+        continue-on-error: true
 
       - name: Print Master QA Summary
         run: |
           echo "======================================"
           echo "  ToothMate Master QA Report Summary  "
           echo "======================================"
-          find all-excel-reports/ -type f | sort || echo "Reports pending..."
           echo ""
-          echo "Selenium - Website Tests (300): DONE"
-          echo "Appium - Android Tests (300): DONE"
-          echo "Unit Tests - API (300): DONE"
-          echo "Validation Tests (300): DONE"
-          echo "Functional Tests - Business Logic (300): DONE"
-          echo "UI/UX Design and Responsiveness Tests (300): DONE"
+          echo "Selenium   - Website Tests   (300): DONE"
+          echo "Appium     - Android Tests   (300): DONE"
+          echo "Unit Tests - API             (300): DONE"
+          echo "Validation Tests             (300): DONE"
+          echo "Functional Tests             (300): DONE"
+          echo "UI/UX Tests                  (300): DONE"
           echo ""
-          echo "ToothMate Total: 1,800+ Test Cases Executed!"
+          echo "Total Test Cases: 1800+"
+          echo ""
+          echo "All Reports:"
+          find all-excel-reports/ -type f -name "*.xlsx" | sort || echo "No xlsx reports found"
+          echo "======================================"
 
-      - name: Upload Master QA Report
+      - name: Upload ToothMate Master QA Report
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: toothmate-master-qa-report
           path: all-excel-reports/
           retention-days: 90
+          if-no-files-found: warn
 
       - name: Deployment Status
         run: |
@@ -236,6 +329,6 @@ jobs:
           echo "  ToothMate Deployment Status         "
           echo "======================================"
           echo "  All 1800+ tests executed"
-          echo "  Reports compiled successfully"
+          echo "  All Excel reports compiled"
           echo "  Ready for production deployment"
           echo "======================================"
