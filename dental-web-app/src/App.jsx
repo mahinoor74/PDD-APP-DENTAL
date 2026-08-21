@@ -21,7 +21,7 @@ const AppLayout = ({ children }) => {
   const hideNav = ['/', '/language', '/demographics', '/auth'].includes(location.pathname);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_10%_20%,#E0F2FE_0%,transparent_40%),radial-gradient(circle_at_90%_80%,#D1FAE5_0%,transparent_40%),radial-gradient(circle_at_50%_50%,#F0FDFA_0%,transparent_60%),#F8FAFC] text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_15%_15%,rgba(129,140,248,0.28)_0%,transparent_50%),radial-gradient(circle_at_85%_15%,rgba(192,132,252,0.28)_0%,transparent_50%),radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.22)_0%,transparent_60%),radial-gradient(circle_at_85%_85%,rgba(236,72,153,0.2)_0%,transparent_50%),#0F172A] text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {!hideNav && <Navbar />}
       <main className="flex-1">{children}</main>
       {!hideNav && <BottomNav />}

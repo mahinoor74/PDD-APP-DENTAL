@@ -21,7 +21,7 @@ export const BottomNav = () => {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-teal-100 shadow-lg backdrop-blur-md px-2 py-1.5">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-2xl border-t border-indigo-500/30 px-3 py-2 md:hidden shadow-2xl">
       <div className="flex items-center justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -30,21 +30,19 @@ export const BottomNav = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all ${
+                `flex flex-col items-center gap-1 p-2 rounded-xl text-[10px] font-extrabold transition-all cursor-pointer ${
                   isActive
-                    ? 'text-teal-700 font-bold scale-105'
-                    : 'text-slate-400 hover:text-slate-700'
+                    ? 'text-indigo-300 scale-110 drop-shadow-[0_0_10px_rgba(129,140,248,0.5)]'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`
               }
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[10px] font-semibold tracking-tight truncate max-w-[64px]">
-                {item.label}
-              </span>
+              <span>{item.label}</span>
             </NavLink>
           );
         })}
       </div>
-    </nav>
+    </div>
   );
 };

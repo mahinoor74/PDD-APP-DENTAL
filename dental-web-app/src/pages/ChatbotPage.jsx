@@ -72,9 +72,9 @@ export const ChatbotPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto my-6 bg-white/95 backdrop-blur-2xl rounded-3xl border-2 border-teal-100 shadow-xl overflow-hidden flex flex-col h-[78vh]">
+    <div className="max-w-4xl mx-auto my-6 bg-slate-900/90 backdrop-blur-2xl rounded-3xl border-2 border-indigo-500/30 shadow-2xl shadow-indigo-950/80 overflow-hidden flex flex-col h-[78vh]">
       {/* Chat Window Header */}
-      <div className="bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 p-4 px-6 text-white flex items-center justify-between shadow-md shrink-0">
+      <div className="bg-gradient-to-r from-indigo-700 via-purple-600 to-violet-700 p-4 px-6 text-white flex items-center justify-between shadow-md shrink-0">
         <div className="flex items-center gap-3.5">
           <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 backdrop-blur-md flex items-center justify-center text-white">
             <Bot className="w-6 h-6 animate-pulse" />
@@ -83,11 +83,11 @@ export const ChatbotPage = () => {
             <h1 className="text-base font-black flex items-center gap-2 tracking-tight">
               <span>{t('chat_title')}</span>
               <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-black border border-white/30 flex items-center gap-1 shadow-xs">
-                <Zap className="w-3 h-3 text-cyan-200 fill-cyan-200" />
+                <Zap className="w-3 h-3 text-purple-200 fill-purple-200" />
                 {t('chat_tag')}
               </span>
             </h1>
-            <p className="text-[11px] text-teal-100 font-medium">
+            <p className="text-[11px] text-purple-100 font-medium">
               {t('chat_desc')}
             </p>
           </div>
@@ -101,7 +101,7 @@ export const ChatbotPage = () => {
       </div>
 
       {/* Chat Message Area */}
-      <div className="bg-slate-50/80 p-6 overflow-y-auto space-y-4 flex-1">
+      <div className="bg-slate-950/70 p-6 overflow-y-auto space-y-4 flex-1">
         {messages.map((msg) => {
           const isUser = msg.sender === 'user';
           return (
@@ -110,22 +110,22 @@ export const ChatbotPage = () => {
               className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
             >
               <div
-                className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${
+                className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 shadow-md ${
                   isUser
-                    ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-bold'
-                    : 'bg-white border border-teal-200 text-teal-700 font-bold'
+                    ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white font-bold'
+                    : 'bg-slate-800 border border-indigo-500/40 text-indigo-300'
                 }`}
               >
-                {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                {isUser ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-indigo-300" />}
               </div>
 
               <div className={`space-y-2 ${isUser ? 'items-end' : 'items-start'}`}>
                 {/* Chat Bubbles */}
                 <div
-                  className={`p-5 text-xs sm:text-sm leading-relaxed shadow-sm ${
+                  className={`p-5 text-xs sm:text-sm leading-relaxed shadow-lg ${
                     isUser
-                      ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-medium rounded-2xl rounded-tr-none shadow-teal-600/20 max-w-[75%]'
-                      : 'bg-white text-slate-900 border-l-4 border-l-teal-600 border border-teal-100 rounded-2xl rounded-tl-none max-w-[80%]'
+                      ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white font-bold rounded-2xl rounded-tr-none shadow-indigo-500/30 max-w-[75%]'
+                      : 'bg-gradient-to-br from-slate-800 to-slate-900 text-slate-100 border-l-4 border-l-indigo-400 border border-slate-700/60 rounded-2xl rounded-tl-none max-w-[80%]'
                   }`}
                 >
                   {msg.text}
@@ -138,7 +138,7 @@ export const ChatbotPage = () => {
                       <button
                         key={idx}
                         onClick={() => handleSend(chip)}
-                        className="bg-teal-50 text-teal-800 hover:bg-teal-600 hover:text-white border border-teal-200 font-bold text-xs px-3.5 py-1.5 rounded-full transition-all cursor-pointer shadow-xs hover:scale-105"
+                        className="bg-indigo-950/90 text-indigo-300 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-500 hover:text-white border border-indigo-400/50 font-bold text-xs px-4 py-2 rounded-full transition-all cursor-pointer shadow-md hover:scale-105"
                       >
                         {chip}
                       </button>
@@ -152,11 +152,11 @@ export const ChatbotPage = () => {
 
         {loading && (
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl bg-white border border-teal-200 text-teal-700 flex items-center justify-center shadow-sm">
-              <Bot className="w-4 h-4 animate-spin text-teal-600" />
+            <div className="w-9 h-9 rounded-2xl bg-slate-800 border border-indigo-500/40 text-indigo-300 flex items-center justify-center shadow-md">
+              <Bot className="w-4 h-4 animate-spin text-indigo-400" />
             </div>
-            <div className="bg-white border border-teal-200 p-4 rounded-2xl rounded-tl-none text-xs text-slate-700 font-semibold shadow-sm flex items-center gap-2.5">
-              <RefreshCw className="w-4 h-4 animate-spin text-teal-600" />
+            <div className="bg-slate-800 border border-indigo-500/30 p-4 rounded-2xl rounded-tl-none text-xs text-slate-200 font-semibold shadow-lg flex items-center gap-2.5">
+              <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
               <span>{t('chat_analyzing')}</span>
             </div>
           </div>
@@ -171,19 +171,19 @@ export const ChatbotPage = () => {
           e.preventDefault();
           handleSend();
         }}
-        className="p-4 bg-white border-t border-slate-200 flex items-center gap-3 shrink-0"
+        className="p-4 bg-slate-900 border-t border-slate-800 flex items-center gap-3 shrink-0"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={t('chat_placeholder')}
-          className="bg-slate-50 border border-slate-200 focus:border-teal-500 text-slate-900 rounded-2xl px-5 py-3.5 w-full outline-none placeholder:text-slate-400 font-medium text-xs sm:text-sm transition-all"
+          className="bg-slate-800/90 border border-indigo-500/40 focus:border-indigo-400 text-white rounded-2xl px-5 py-3.5 w-full outline-none placeholder:text-slate-400 font-medium text-xs sm:text-sm transition-all"
         />
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold p-3.5 rounded-xl shadow-md shadow-teal-600/20 transition-transform active:scale-95 disabled:opacity-40 cursor-pointer shrink-0"
+          className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-bold p-3.5 rounded-xl shadow-lg shadow-indigo-500/30 transition-transform active:scale-95 disabled:opacity-40 cursor-pointer shrink-0"
         >
           <Send className="w-5 h-5 text-white" />
         </button>

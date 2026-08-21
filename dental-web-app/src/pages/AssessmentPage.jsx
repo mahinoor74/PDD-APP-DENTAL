@@ -109,15 +109,15 @@ export const AssessmentPage = () => {
       )}
 
       {/* Main Survey Title Card */}
-      <div className="bg-white border border-teal-100 rounded-3xl p-8 shadow-sm text-center max-w-4xl mx-auto mb-6 space-y-2">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold">
-          <ClipboardCheck className="w-4 h-4 text-teal-600" />
+      <div className="bg-slate-900/90 border border-indigo-500/30 rounded-3xl p-8 shadow-2xl text-center max-w-4xl mx-auto mb-6 space-y-2 backdrop-blur-xl">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-xs font-black shadow-sm">
+          <ClipboardCheck className="w-4 h-4 text-indigo-400" />
           <span>{t('assess_tag')}</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
+        <h1 className="text-2xl sm:text-3xl font-black text-white">
           {t('assess_title')}
         </h1>
-        <p className="text-slate-600 text-xs sm:text-sm max-w-xl mx-auto font-medium">
+        <p className="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto font-medium">
           {t('assess_desc')}
         </p>
       </div>
@@ -133,17 +133,17 @@ export const AssessmentPage = () => {
                   onClick={() => toggleKey(q.key)}
                   className={`rounded-2xl p-6 transition-all cursor-pointer flex items-center justify-between ${
                     isChecked
-                      ? 'border-2 border-teal-600 bg-teal-50/60 shadow-md shadow-teal-600/10'
-                      : 'bg-white hover:bg-teal-50/40 border border-slate-200 hover:border-teal-400 shadow-sm hover:shadow-md'
+                      ? 'bg-gradient-to-r from-indigo-950 via-purple-950 to-slate-900 border-2 border-indigo-400 shadow-2xl shadow-indigo-500/30'
+                      : 'bg-slate-900/80 hover:bg-slate-800/90 border border-slate-700/80 hover:border-indigo-400/80 shadow-xl hover:shadow-indigo-500/20 hover:-translate-y-1'
                   }`}
                 >
                   <div className="flex items-start gap-4">
                     <span className="text-3xl shrink-0 mt-0.5">{q.icon}</span>
                     <div className="space-y-1">
-                      <h3 className="text-sm font-extrabold text-slate-900">
+                      <h3 className="text-sm font-black text-white">
                         {q.title}
                       </h3>
-                      <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                      <p className="text-xs text-slate-400 font-medium leading-relaxed">
                         {q.desc}
                       </p>
                     </div>
@@ -153,7 +153,7 @@ export const AssessmentPage = () => {
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => {}}
-                    className="accent-teal-600 w-5 h-5 cursor-pointer shrink-0 ml-3"
+                    className="accent-indigo-400 w-5 h-5 cursor-pointer shrink-0 ml-3"
                   />
                 </div>
               );
@@ -163,10 +163,10 @@ export const AssessmentPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-base shadow-lg shadow-teal-600/25 flex items-center justify-center gap-2 transition cursor-pointer"
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-white font-black text-base shadow-xl shadow-indigo-500/30 flex items-center justify-center gap-2 transition cursor-pointer transform hover:scale-[1.01]"
           >
             <span>{loading ? t('btn_processing') : t('assess_btn_analyze')}</span>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5 text-white" />
           </button>
         </form>
       ) : (

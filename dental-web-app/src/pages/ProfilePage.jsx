@@ -92,16 +92,16 @@ export const ProfilePage = () => {
       )}
 
       {/* Hero Profile Card */}
-      <div className="bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-800 text-white p-6 sm:p-8 rounded-3xl shadow-xl shadow-teal-900/20 border border-teal-400/30 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-indigo-700 via-purple-600 to-violet-700 text-white p-6 sm:p-8 rounded-3xl shadow-2xl shadow-indigo-950/40 border border-indigo-400/30 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-white/20 p-0.5 shadow-xl flex items-center justify-center backdrop-blur-md">
-            <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-xl font-black text-teal-800">
+            <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-xl font-black text-indigo-950">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'M'}
             </div>
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-black">{user?.name || 'Mahin'}</h1>
-            <p className="text-xs text-teal-100 font-medium">{user?.email || 'mahin@toothmate.com'}</p>
+            <p className="text-xs text-indigo-100 font-medium">{user?.email || 'mahin@toothmate.com'}</p>
             <div className="mt-1 flex items-center gap-2">
               <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-white/20 text-white uppercase backdrop-blur-md">
                 {user?.ageGroup || 'Adult'} Care Profile
@@ -115,7 +115,7 @@ export const ProfilePage = () => {
             logout();
             navigate('/auth');
           }}
-          className="px-4 py-2.5 rounded-2xl bg-white/15 hover:bg-white/25 text-white border border-white/30 text-xs font-extrabold flex items-center gap-2 transition backdrop-blur-md cursor-pointer"
+          className="px-4 py-2.5 rounded-2xl bg-white/20 hover:bg-white/30 text-white border border-white/35 text-xs font-black flex items-center gap-2 transition backdrop-blur-md cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
           <span>{t('nav_sign_out')}</span>
@@ -123,46 +123,46 @@ export const ProfilePage = () => {
       </div>
 
       {/* Demographics Form */}
-      <form onSubmit={handleSaveProfile} className="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
+      <form onSubmit={handleSaveProfile} className="bg-slate-900/90 border border-indigo-500/30 p-6 rounded-3xl shadow-2xl space-y-4 backdrop-blur-xl text-white">
         <div className="flex items-center gap-2 mb-2">
-          <User className="w-5 h-5 text-teal-600" />
-          <h2 className="text-base font-extrabold text-slate-900">{t('prof_demographics_title')}</h2>
+          <User className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-base font-black text-white">{t('prof_demographics_title')}</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-extrabold text-slate-700 uppercase">{t('demo_name_label')}</label>
+            <label className="text-xs font-black text-slate-300 uppercase">{t('demo_name_label')}</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-teal-500"
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/90 border border-indigo-500/40 text-xs font-semibold text-white focus:outline-none focus:border-indigo-400"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-extrabold text-slate-700 uppercase">{t('demo_age_label')}</label>
+            <label className="text-xs font-black text-slate-300 uppercase">{t('demo_age_label')}</label>
             <select
               value={ageGroup}
               onChange={(e) => setAgeGroup(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-teal-500"
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/90 border border-indigo-500/40 text-xs font-semibold text-white focus:outline-none focus:border-indigo-400"
             >
-              <option value="child">{t('demo_child')}</option>
-              <option value="adult">{t('demo_adult')}</option>
-              <option value="senior">{t('demo_senior')}</option>
+              <option value="child" className="bg-slate-900 text-white">{t('demo_child')}</option>
+              <option value="adult" className="bg-slate-900 text-white">{t('demo_adult')}</option>
+              <option value="senior" className="bg-slate-900 text-white">{t('demo_senior')}</option>
             </select>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-extrabold text-slate-700 uppercase">{t('demo_gender_label')}</label>
+            <label className="text-xs font-black text-slate-300 uppercase">{t('demo_gender_label')}</label>
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-teal-500"
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/90 border border-indigo-500/40 text-xs font-semibold text-white focus:outline-none focus:border-indigo-400"
             >
-              <option value="male">{t('demo_male')}</option>
-              <option value="female">{t('demo_female')}</option>
-              <option value="other">{t('demo_other')}</option>
+              <option value="male" className="bg-slate-900 text-white">{t('demo_male')}</option>
+              <option value="female" className="bg-slate-900 text-white">{t('demo_female')}</option>
+              <option value="other" className="bg-slate-900 text-white">{t('demo_other')}</option>
             </select>
           </div>
         </div>
@@ -170,7 +170,7 @@ export const ProfilePage = () => {
         <button
           type="submit"
           disabled={loading}
-          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-extrabold text-xs flex items-center gap-1.5 transition ml-auto shadow-md shadow-teal-600/20 cursor-pointer"
+          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white font-black text-xs flex items-center gap-1.5 transition ml-auto shadow-lg shadow-indigo-500/30 cursor-pointer"
         >
           <Save className="w-3.5 h-3.5" />
           <span>{t('btn_save')}</span>
@@ -178,35 +178,35 @@ export const ProfilePage = () => {
       </form>
 
       {/* Reminder Schedule Settings */}
-      <div className="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
+      <div className="bg-slate-900/90 border border-indigo-500/30 p-6 rounded-3xl shadow-2xl space-y-4 backdrop-blur-xl text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-teal-600" />
-            <h2 className="text-base font-extrabold text-slate-900">{t('prof_reminders_title')}</h2>
+            <Clock className="w-5 h-5 text-indigo-400" />
+            <h2 className="text-base font-black text-white">{t('prof_reminders_title')}</h2>
           </div>
-          <span className="text-[11px] text-teal-700 font-mono font-bold">24H TIMERS</span>
+          <span className="text-[11px] text-indigo-300 font-mono font-black">24H TIMERS</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Morning Reminder Container */}
-          <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-2">
-            <label className="text-xs font-extrabold text-amber-900">{t('prof_morning_alarm')}</label>
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400/40 space-y-2">
+            <label className="text-xs font-black text-amber-300">{t('prof_morning_alarm')}</label>
             <input
               type="time"
               value={morningTime}
               onChange={(e) => setMorningTime(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-amber-300 text-sm font-mono text-amber-950 font-bold focus:outline-none"
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-amber-400/50 text-sm font-mono text-amber-200 font-bold focus:outline-none"
             />
           </div>
 
           {/* Night Reminder Container */}
-          <div className="p-4 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2">
-            <label className="text-xs font-extrabold text-purple-900">{t('prof_night_alarm')}</label>
+          <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-400/40 space-y-2">
+            <label className="text-xs font-black text-purple-300">{t('prof_night_alarm')}</label>
             <input
               type="time"
               value={nightTime}
               onChange={(e) => setNightTime(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-purple-300 text-sm font-mono text-purple-950 font-bold focus:outline-none"
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-purple-400/50 text-sm font-mono text-purple-200 font-bold focus:outline-none"
             />
           </div>
         </div>
@@ -214,7 +214,7 @@ export const ProfilePage = () => {
         <button
           onClick={handleSaveReminders}
           disabled={loading}
-          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-extrabold text-xs flex items-center gap-1.5 transition ml-auto shadow-md shadow-teal-600/20 cursor-pointer"
+          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white font-black text-xs flex items-center gap-1.5 transition ml-auto shadow-lg shadow-indigo-500/30 cursor-pointer"
         >
           <Bell className="w-3.5 h-3.5" />
           <span>{t('prof_save_reminders')}</span>
@@ -222,10 +222,10 @@ export const ProfilePage = () => {
       </div>
 
       {/* Language Preferences */}
-      <div className="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
+      <div className="bg-slate-900/90 border border-indigo-500/30 p-6 rounded-3xl shadow-2xl space-y-4 backdrop-blur-xl text-white">
         <div className="flex items-center gap-2">
-          <Globe className="w-5 h-5 text-indigo-600" />
-          <h2 className="text-base font-extrabold text-slate-900">{t('prof_lang_title')}</h2>
+          <Globe className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-base font-black text-white">{t('prof_lang_title')}</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
@@ -240,15 +240,15 @@ export const ProfilePage = () => {
                 }}
                 className={`py-3 px-3.5 rounded-2xl border text-xs font-bold transition flex items-center justify-between cursor-pointer ${
                   isSelected
-                    ? 'bg-teal-50 border-teal-500 text-teal-900 font-extrabold shadow-sm'
-                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    ? 'bg-indigo-500/20 border-indigo-400 text-indigo-200 font-black shadow-md'
+                    : 'bg-slate-800/80 border-slate-700/80 text-slate-300 hover:bg-slate-700/80'
                 }`}
               >
                 <span className="flex items-center gap-2">
                   <span className="text-lg">{lang.flag}</span>
                   <span>{lang.name}</span>
                 </span>
-                {isSelected && <Check className="w-4 h-4 text-teal-600 stroke-[3]" />}
+                {isSelected && <Check className="w-4 h-4 text-indigo-400 stroke-[3]" />}
               </button>
             );
           })}

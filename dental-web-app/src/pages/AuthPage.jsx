@@ -91,7 +91,7 @@ export const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(135deg,#F8FAFC_0%,#F0FDFA_50%,#ECFDF5_100%)] text-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_15%_15%,rgba(129,140,248,0.28)_0%,transparent_50%),radial-gradient(circle_at_85%_15%,rgba(192,132,252,0.28)_0%,transparent_50%),radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.22)_0%,transparent_60%),radial-gradient(circle_at_85%_85%,rgba(236,72,153,0.2)_0%,transparent_50%),#0F172A] text-slate-100 flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {toastMessage && (
         <Toast
           message={toastMessage.message}
@@ -103,19 +103,19 @@ export const AuthPage = () => {
       <div className="w-full max-w-md mx-auto space-y-6 py-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-500 p-0.5 shadow-lg shadow-teal-600/20 flex items-center justify-center">
-            <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
-              <Sparkles className="w-7 h-7 text-teal-600" />
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-xl shadow-indigo-500/30 flex items-center justify-center">
+            <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+              <Sparkles className="w-7 h-7 text-indigo-300 animate-pulse" />
             </div>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
+          <h2 className="text-2xl sm:text-3xl font-black text-white">
             {showRecover
               ? t('auth_recover_title')
               : isSignUp
               ? t('auth_signup_title')
               : t('auth_signin_title')}
           </h2>
-          <p className="text-slate-600 text-xs sm:text-sm">
+          <p className="text-slate-300 text-xs sm:text-sm font-medium">
             {showRecover
               ? t('auth_recover_desc')
               : isSignUp
@@ -126,23 +126,23 @@ export const AuthPage = () => {
 
         {/* Tab switcher */}
         {!showRecover && (
-          <div className="flex rounded-2xl p-1 bg-white border border-slate-200 shadow-sm">
+          <div className="flex rounded-2xl p-1.5 bg-slate-900/90 border border-indigo-500/30 shadow-xl backdrop-blur-xl">
             <button
               onClick={() => setIsSignUp(false)}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition ${
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition cursor-pointer ${
                 !isSignUp
-                  ? 'bg-teal-600 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white shadow-md shadow-indigo-500/30'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               {t('auth_tab_signin')}
             </button>
             <button
               onClick={() => setIsSignUp(true)}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition ${
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition cursor-pointer ${
                 isSignUp
-                  ? 'bg-teal-600 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white shadow-md shadow-indigo-500/30'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               {t('auth_tab_register')}
@@ -151,22 +151,22 @@ export const AuthPage = () => {
         )}
 
         {/* Form Container */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div className="bg-slate-900/90 p-6 rounded-3xl border border-indigo-500/30 shadow-2xl backdrop-blur-xl">
           {showRecover ? (
             <form onSubmit={handleRecover} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <label className="text-xs font-black text-slate-300 uppercase tracking-wider">
                   {t('auth_email_label')}
                 </label>
                 <div className="relative">
-                  <Mail className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                  <Mail className="w-5 h-5 text-indigo-400 absolute left-3.5 top-3.5" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="mahin@toothmate.com"
-                    className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-500 font-medium"
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-800/90 border border-indigo-500/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 font-bold"
                   />
                 </div>
               </div>
@@ -174,16 +174,16 @@ export const AuthPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-bold text-sm shadow-md shadow-teal-600/20 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-white font-black text-sm shadow-xl shadow-indigo-500/30 flex items-center justify-center gap-2 cursor-pointer"
               >
-                <KeyRound className="w-4 h-4" />
+                <KeyRound className="w-4 h-4 text-white" />
                 <span>{t('auth_btn_send_link')}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShowRecover(false)}
-                className="w-full text-xs text-slate-500 hover:text-slate-900 font-bold"
+                className="w-full text-xs text-slate-400 hover:text-white font-bold cursor-pointer"
               >
                 {t('auth_btn_back_signin')}
               </button>
@@ -192,64 +192,64 @@ export const AuthPage = () => {
             <form onSubmit={handleAuth} className="space-y-4">
               {isSignUp && (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider">
                     {t('demo_name_label')}
                   </label>
                   <div className="relative">
-                    <User className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                    <User className="w-5 h-5 text-indigo-400 absolute left-3.5 top-3.5" />
                     <input
                       type="text"
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Mahin"
-                      className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-500 font-medium"
+                      className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-800/90 border border-indigo-500/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 font-bold"
                     />
                   </div>
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <label className="text-xs font-black text-slate-300 uppercase tracking-wider">
                   {t('auth_email_label')}
                 </label>
                 <div className="relative">
-                  <Mail className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                  <Mail className="w-5 h-5 text-indigo-400 absolute left-3.5 top-3.5" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="mahin@toothmate.com"
-                    className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-500 font-medium"
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-800/90 border border-indigo-500/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 font-bold"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  <label className="text-xs font-black text-slate-300 uppercase tracking-wider">
                     {t('auth_password_label')}
                   </label>
                   {!isSignUp && (
                     <button
                       type="button"
                       onClick={() => setShowRecover(true)}
-                      className="text-[11px] text-teal-700 hover:underline font-bold"
+                      className="text-[11px] text-indigo-400 hover:underline font-bold cursor-pointer"
                     >
                       {t('auth_forgot_password')}
                     </button>
                   )}
                 </div>
                 <div className="relative">
-                  <Lock className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                  <Lock className="w-5 h-5 text-indigo-400 absolute left-3.5 top-3.5" />
                   <input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-500 font-medium"
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-800/90 border border-indigo-500/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 font-bold"
                   />
                 </div>
               </div>
@@ -257,7 +257,7 @@ export const AuthPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-sm shadow-md shadow-teal-600/20 flex items-center justify-center gap-2 transition duration-300 disabled:opacity-50"
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-white font-black text-sm shadow-xl shadow-indigo-500/30 flex items-center justify-center gap-2 transition duration-300 disabled:opacity-50 cursor-pointer transform hover:scale-[1.01]"
               >
                 <span>
                   {loading
@@ -266,7 +266,7 @@ export const AuthPage = () => {
                     ? t('auth_tab_register')
                     : t('auth_tab_signin')}
                 </span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-white" />
               </button>
             </form>
           )}

@@ -152,23 +152,23 @@ export const SmartMirrorPage = () => {
         />
       )}
 
-      {/* Top Header Bar */}
-      <div className="bg-white border border-teal-100 rounded-2xl p-5 shadow-sm mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+      {/* Top Floating Header Bar */}
+      <div className="bg-slate-900/90 border border-indigo-500/30 rounded-3xl p-6 shadow-2xl mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 backdrop-blur-xl">
+        <div className="flex items-center gap-3.5">
           <button
             onClick={() => navigate('/dashboard')}
-            className="p-2.5 rounded-xl bg-slate-100 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+            className="p-2.5 rounded-2xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition cursor-pointer border border-slate-700"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
               <span>{t('mirror_title')}</span>
-              <span className="px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 text-xs font-bold border border-teal-200">
+              <span className="px-3 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-black border border-indigo-400/40 shadow-sm">
                 {t('mirror_tag')}
               </span>
             </h1>
-            <p className="text-xs text-slate-500 font-medium">
+            <p className="text-xs text-slate-400 font-medium">
               {t('mirror_desc')}
             </p>
           </div>
@@ -178,14 +178,14 @@ export const SmartMirrorPage = () => {
         <div className="relative w-full sm:w-auto">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
-            className="w-full sm:w-72 px-4 py-2.5 rounded-2xl bg-white border border-teal-200 text-teal-900 font-bold text-xs flex items-center justify-between shadow-sm hover:border-teal-400 cursor-pointer"
+            className="w-full sm:w-72 px-4.5 py-3 rounded-2xl bg-slate-800/90 border border-indigo-500/40 text-indigo-300 font-black text-xs flex items-center justify-between shadow-lg hover:border-indigo-400 cursor-pointer"
           >
             <span className="truncate">{activeTechnique.name}</span>
-            <ChevronDown className="w-4 h-4 text-teal-600 shrink-0 ml-2" />
+            <ChevronDown className="w-4 h-4 text-indigo-400 shrink-0 ml-2" />
           </button>
 
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-full sm:w-80 rounded-2xl bg-white border border-teal-100 shadow-xl z-50 overflow-hidden py-1.5">
+            <div className="absolute right-0 mt-2 w-full sm:w-80 rounded-2xl bg-slate-900 border border-indigo-500/40 shadow-2xl z-50 overflow-hidden py-1.5 backdrop-blur-2xl">
               {CLINICAL_TECHNIQUES.map((tech) => (
                 <button
                   key={tech.id}
@@ -196,15 +196,15 @@ export const SmartMirrorPage = () => {
                   }}
                   className={`w-full text-left px-4 py-3 text-xs transition cursor-pointer flex items-center justify-between ${
                     tech.id === selectedTechniqueId
-                      ? 'bg-teal-50 text-teal-900 font-extrabold'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'bg-indigo-500/20 text-indigo-300 font-black'
+                      : 'text-slate-300 hover:bg-slate-800'
                   }`}
                 >
                   <div>
-                    <div>{tech.name}</div>
-                    <div className="text-[10px] text-slate-500 font-normal">{tech.category}</div>
+                    <div className="font-bold">{tech.name}</div>
+                    <div className="text-[10px] text-slate-400 font-medium">{tech.category}</div>
                   </div>
-                  {tech.id === selectedTechniqueId && <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />}
+                  {tech.id === selectedTechniqueId && <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" />}
                 </button>
               ))}
             </div>
@@ -216,7 +216,7 @@ export const SmartMirrorPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Camera Container */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl text-white relative w-full aspect-video overflow-hidden group">
+          <div className="bg-slate-950 border-2 border-indigo-500/40 rounded-3xl p-6 shadow-2xl text-white relative w-full aspect-video overflow-hidden group">
             {cameraActive ? (
               <video
                 ref={videoRef}
@@ -226,14 +226,16 @@ export const SmartMirrorPage = () => {
                 className="w-full h-full object-cover transform -scale-x-100 rounded-2xl"
               />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-slate-900 text-white rounded-2xl">
-                <CameraOff className="w-12 h-12 text-slate-500" />
-                <p className="text-slate-400 text-xs sm:text-sm">
+              <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-4 bg-slate-950 text-white rounded-2xl">
+                <div className="w-16 h-16 rounded-3xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500 shadow-inner">
+                  <CameraOff className="w-8 h-8 text-slate-400" />
+                </div>
+                <p className="text-slate-400 text-xs sm:text-sm font-medium">
                   {t('mirror_camera_paused')}
                 </p>
                 <button
                   onClick={startCamera}
-                  className="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-teal-500/30 cursor-pointer"
+                  className="bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white font-black px-6 py-3.5 rounded-2xl shadow-xl shadow-indigo-500/30 hover:scale-105 transition-all cursor-pointer text-xs"
                 >
                   {t('mirror_btn_camera')}
                 </button>
@@ -242,36 +244,36 @@ export const SmartMirrorPage = () => {
 
             {/* Overlays on Webcam Stream */}
             <div className="absolute top-8 left-8 right-8 flex items-center justify-between pointer-events-none">
-              <div className="px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-slate-700/80 backdrop-blur-md text-xs font-mono font-bold text-white flex items-center gap-2">
+              <div className="px-4 py-2 rounded-full bg-slate-950/85 border border-indigo-500/50 backdrop-blur-md text-xs font-mono font-black text-indigo-300 flex items-center gap-2 shadow-lg">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
                 <span>{formatTime(secondsRemaining)}</span>
               </div>
 
               <button
                 onClick={toggleMute}
-                className="pointer-events-auto p-2.5 rounded-full bg-slate-950/80 border border-slate-700/80 text-white hover:text-emerald-400 transition cursor-pointer"
+                className="pointer-events-auto p-3 rounded-full bg-slate-950/85 border border-indigo-500/50 text-white hover:text-indigo-300 transition cursor-pointer shadow-lg"
               >
-                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+                {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
               </button>
             </div>
 
             {/* Progress Bar along bottom of camera container */}
-            <div className="absolute bottom-0 left-0 right-0 h-2.5 bg-slate-950/80">
+            <div className="absolute bottom-0 left-0 right-0 h-2.5 bg-slate-950">
               <div
-                className="h-full bg-gradient-to-r from-teal-500 via-emerald-400 to-teal-300 transition-all duration-500"
+                className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-400 transition-all duration-500"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
           </div>
 
           {/* Timer Controls Bar */}
-          <div className="flex items-center justify-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+          <div className="flex items-center justify-center gap-4 bg-slate-900/90 p-4 rounded-3xl border border-indigo-500/30 shadow-2xl backdrop-blur-xl">
             <button
               onClick={handleStartPause}
-              className={`px-8 py-3.5 rounded-2xl font-black text-sm shadow-lg flex items-center gap-2 transition transform hover:scale-105 cursor-pointer ${
+              className={`px-8 py-3.5 rounded-2xl font-black text-sm shadow-xl flex items-center gap-2 transition transform hover:scale-105 cursor-pointer ${
                 isRunning
-                  ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
-                  : 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-teal-600/20'
+                  ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'
+                  : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white shadow-indigo-500/30'
               }`}
             >
               {isRunning ? <Pause className="w-5 h-5 fill-slate-950" /> : <Play className="w-5 h-5 fill-white" />}
@@ -280,7 +282,7 @@ export const SmartMirrorPage = () => {
 
             <button
               onClick={handleReset}
-              className="p-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer"
+              className="p-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer border border-slate-700"
               title="Reset Timer"
             >
               <RotateCcw className="w-5 h-5" />
@@ -291,7 +293,7 @@ export const SmartMirrorPage = () => {
         {/* Right Quadrant Map & Zone Script Cards */}
         <div className="lg:col-span-5 space-y-4">
           {/* Upper Quadrant Map Card */}
-          <div className="bg-white border border-teal-100 rounded-3xl p-6 shadow-sm">
+          <div className="bg-slate-900/90 border border-indigo-500/30 rounded-3xl p-6 shadow-2xl backdrop-blur-xl">
             <DynamicBrushCanvas
               currentZoneIdx={currentZoneIdx}
               motionType={activeTechnique.motionType}
@@ -301,26 +303,26 @@ export const SmartMirrorPage = () => {
           </div>
 
           {/* Zone Script Card */}
-          <div className="bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200/70 rounded-3xl p-6 shadow-sm text-slate-800 space-y-3">
+          <div className="bg-gradient-to-br from-slate-900 via-indigo-950/90 to-purple-950/90 border border-indigo-400/40 rounded-3xl p-6 shadow-2xl text-slate-100 space-y-3 backdrop-blur-xl">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono font-bold text-teal-800 bg-white/80 px-2.5 py-1 rounded-full border border-teal-200 uppercase">
+              <span className="text-[11px] font-mono font-black text-indigo-300 bg-indigo-950/90 px-3 py-1 rounded-full border border-indigo-400/40 uppercase">
                 {t('mirror_zone_label')} {currentZoneIdx + 1} {t('mirror_of')} 6 • {activeZoneScript.quadrantName}
               </span>
-              <span className="text-xs text-slate-500 font-bold">
+              <span className="text-xs text-slate-400 font-bold">
                 {activeZoneScript.startTimeSeconds}s - {activeZoneScript.startTimeSeconds + 20}s
               </span>
             </div>
 
-            <h3 className="text-base font-black text-slate-900">
+            <h3 className="text-base font-black text-white">
               {activeZoneScript.title}
             </h3>
 
-            <p className="text-sm text-slate-800 leading-relaxed font-semibold bg-white p-4 rounded-2xl border border-teal-100">
+            <p className="text-sm text-slate-200 leading-relaxed font-semibold bg-slate-950/80 p-4 rounded-2xl border border-indigo-500/30 shadow-inner">
               "{activeZoneScript.script}"
             </p>
 
-            <div className="flex items-center gap-2 text-xs text-teal-900 bg-white/80 p-3 rounded-xl border border-teal-200 font-medium">
-              <Info className="w-4 h-4 text-teal-600 shrink-0" />
+            <div className="flex items-center gap-2 text-xs text-indigo-300 bg-indigo-950/60 p-3.5 rounded-2xl border border-indigo-400/30 font-medium">
+              <Info className="w-4 h-4 text-indigo-400 shrink-0" />
               <span>{t('mirror_tip_label')}: {activeZoneScript.clinicalTip}</span>
             </div>
           </div>

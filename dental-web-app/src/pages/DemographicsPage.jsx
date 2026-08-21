@@ -55,7 +55,7 @@ export const DemographicsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/40 to-emerald-50/30 text-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_15%_15%,rgba(129,140,248,0.28)_0%,transparent_50%),radial-gradient(circle_at_85%_15%,rgba(192,132,252,0.28)_0%,transparent_50%),radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.22)_0%,transparent_60%),radial-gradient(circle_at_85%_85%,rgba(236,72,153,0.2)_0%,transparent_50%),#0F172A] text-slate-100 flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {toastMessage && (
         <Toast
           message={toastMessage.message}
@@ -67,14 +67,14 @@ export const DemographicsPage = () => {
       <div className="w-full max-w-md mx-auto space-y-6 py-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-100/80 border border-teal-200 text-teal-800 text-xs font-bold">
-            <User className="w-4 h-4 text-teal-600" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-xs font-black shadow-sm">
+            <User className="w-4 h-4 text-indigo-400" />
             <span>{t('demo_tag')}</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
+          <h2 className="text-2xl sm:text-3xl font-black text-white">
             {t('demo_title')}
           </h2>
-          <p className="text-slate-600 text-xs sm:text-sm">
+          <p className="text-slate-300 text-xs sm:text-sm font-medium">
             {t('demo_desc')}
           </p>
         </div>
@@ -82,7 +82,7 @@ export const DemographicsPage = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name Input */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="text-xs font-black text-slate-300 uppercase tracking-wider">
               {t('demo_name_label')}
             </label>
             <input
@@ -91,13 +91,13 @@ export const DemographicsPage = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={t('demo_name_placeholder')}
-              className="w-full px-4 py-3.5 rounded-2xl bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition shadow-sm font-semibold"
+              className="w-full px-4 py-3.5 rounded-2xl bg-slate-900/90 border border-indigo-500/40 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 transition shadow-lg font-bold"
             />
           </div>
 
           {/* Age Group Selection */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="text-xs font-black text-slate-300 uppercase tracking-wider">
               {t('demo_age_label')}
             </label>
             <div className="grid grid-cols-1 gap-2.5">
@@ -108,16 +108,16 @@ export const DemographicsPage = () => {
                     type="button"
                     key={opt.id}
                     onClick={() => setAgeGroup(opt.id)}
-                    className={`flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-all ${
+                    className={`flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-gradient-to-r from-teal-50 to-emerald-50 border-teal-500 text-teal-900 shadow-md shadow-teal-600/10'
-                        : 'bg-white border-slate-200 text-slate-700 hover:border-teal-200'
+                        ? 'bg-gradient-to-r from-indigo-950 via-purple-950 to-slate-900 border-2 border-indigo-400 text-white shadow-xl shadow-indigo-500/25'
+                        : 'bg-slate-900/90 border-slate-700/80 text-slate-200 hover:border-indigo-400/60'
                     }`}
                   >
                     <span className="text-2xl">{opt.icon}</span>
                     <div>
-                      <div className="text-sm font-extrabold">{opt.label}</div>
-                      <div className="text-xs text-slate-500">{opt.desc}</div>
+                      <div className="text-sm font-black">{opt.label}</div>
+                      <div className="text-xs text-slate-400 font-medium">{opt.desc}</div>
                     </div>
                   </button>
                 );
@@ -127,7 +127,7 @@ export const DemographicsPage = () => {
 
           {/* Gender Selection */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="text-xs font-black text-slate-300 uppercase tracking-wider">
               {t('demo_gender_label')}
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -140,10 +140,10 @@ export const DemographicsPage = () => {
                   type="button"
                   key={g.id}
                   onClick={() => setGender(g.id)}
-                  className={`py-2.5 rounded-xl border text-xs font-bold transition ${
+                  className={`py-2.5 rounded-xl border text-xs font-black transition cursor-pointer ${
                     gender === g.id
-                      ? 'bg-teal-600 border-teal-600 text-white shadow-sm'
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-teal-200'
+                      ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white font-black border-indigo-400 shadow-md'
+                      : 'bg-slate-900/90 border-slate-700/80 text-slate-300 hover:border-indigo-400/60'
                   }`}
                 >
                   {g.label}
@@ -156,10 +156,10 @@ export const DemographicsPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-base shadow-lg shadow-teal-600/25 flex items-center justify-center gap-2 transition duration-300 disabled:opacity-50"
+            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-white font-black text-base shadow-xl shadow-indigo-500/30 flex items-center justify-center gap-2 transition duration-300 disabled:opacity-50 cursor-pointer transform hover:scale-[1.01]"
           >
             <span>{loading ? t('btn_saving') : t('btn_save_continue')}</span>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5 text-white" />
           </button>
         </form>
       </div>

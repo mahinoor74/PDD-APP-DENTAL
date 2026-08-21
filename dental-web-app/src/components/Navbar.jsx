@@ -50,23 +50,23 @@ export const Navbar = () => {
   ];
 
   return (
-    <header className="bg-white/85 backdrop-blur-xl border-b border-teal-100 shadow-sm px-8 py-3.5 flex justify-between items-center sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-6">
+    <header className="sticky top-0 z-50 w-full bg-slate-900/90 backdrop-blur-2xl border-b border-indigo-500/30 shadow-2xl px-8 py-3.5">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
         {/* Logo & Brand */}
         <div className="flex items-center gap-3.5 cursor-pointer shrink-0" onClick={() => navigate('/dashboard')}>
-          <div className="bg-gradient-to-tr from-teal-600 via-emerald-500 to-cyan-500 text-white font-bold p-2.5 rounded-2xl shadow-md shadow-teal-500/20 flex items-center justify-center">
+          <div className="bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white font-black p-2.5 rounded-2xl shadow-lg shadow-indigo-500/30 flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-xl tracking-tight text-slate-900">
-                ToothMate <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">AI</span>
+              <span className="font-black text-xl tracking-tight text-white">
+                ToothMate <span className="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">AI</span>
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
+              <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/40 shadow-sm">
                 {t('nav_pro_badge')}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
+            <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
               {t('nav_subtitle')}
             </p>
           </div>
@@ -81,10 +81,10 @@ export const Navbar = () => {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center rounded-xl px-4 py-2 text-xs lg:text-sm transition-all ${
+                  `flex items-center rounded-xl px-4 py-2.5 text-xs lg:text-sm transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-bold shadow-md shadow-teal-600/25'
-                      : 'text-slate-600 hover:text-teal-700 hover:bg-teal-50 font-semibold'
+                      ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 text-white font-black shadow-lg shadow-indigo-500/30 scale-105'
+                      : 'text-slate-300 hover:text-white hover:bg-white/10 font-bold'
                   }`
                 }
               >
@@ -95,21 +95,21 @@ export const Navbar = () => {
           })}
         </nav>
 
-        {/* Language Selector & User Action */}
+        {/* Language Selector & User Profile Badge */}
         <div className="flex items-center gap-3 shrink-0">
           {/* Global Language Selector Dropdown */}
           <div className="relative">
             <button
               onClick={() => setShowLangMenu(!showLangMenu)}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-teal-50 shadow-xs transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl border border-indigo-500/40 bg-slate-800/90 px-3.5 py-2 text-xs font-bold text-slate-200 hover:bg-slate-700/80 shadow-md transition cursor-pointer"
             >
               <span>{currentLangObj.flag}</span>
               <span className="hidden sm:inline">{currentLangObj.name}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+              <ChevronDown className="w-3.5 h-3.5 text-indigo-400" />
             </button>
 
             {showLangMenu && (
-              <div className="absolute right-0 mt-2 w-36 rounded-2xl bg-white border border-teal-100 shadow-xl py-1.5 z-50 overflow-hidden">
+              <div className="absolute right-0 mt-2 w-40 rounded-2xl bg-slate-900 border border-indigo-500/40 shadow-2xl py-1.5 z-50 overflow-hidden backdrop-blur-2xl">
                 {LANG_OPTIONS.map((opt) => (
                   <button
                     key={opt.code}
@@ -117,10 +117,10 @@ export const Navbar = () => {
                       setLanguage(opt.code);
                       setShowLangMenu(false);
                     }}
-                    className={`w-full text-left px-3.5 py-2 text-xs font-bold flex items-center justify-between transition cursor-pointer ${
+                    className={`w-full text-left px-4 py-2.5 text-xs font-bold flex items-center justify-between transition cursor-pointer ${
                       language === opt.code
-                        ? 'bg-teal-50 text-teal-700 font-extrabold'
-                        : 'text-slate-700 hover:bg-slate-50'
+                        ? 'bg-indigo-500/20 text-indigo-300 font-black'
+                        : 'text-slate-300 hover:bg-slate-800'
                     }`}
                   >
                     <span className="flex items-center gap-2">
@@ -133,13 +133,13 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* User Profile Pill */}
-          <div className="hidden sm:flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-1.5 shadow-xs text-xs font-semibold text-slate-800">
-            <span className="font-bold text-slate-900">
+          {/* User Profile Badge */}
+          <div className="hidden sm:flex items-center gap-2 bg-slate-800/90 border border-indigo-500/40 rounded-full px-4 py-1.5 shadow-md">
+            <span className="font-black text-white text-xs">
               {user?.name || 'Mahin'}
             </span>
-            <span className="text-[10px] text-teal-700 font-semibold flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="text-[10px] text-indigo-300 font-bold flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
               {user?.ageGroup ? user.ageGroup.toUpperCase() : 'ADULT'}
             </span>
           </div>
@@ -148,14 +148,14 @@ export const Navbar = () => {
             <button
               onClick={handleLogout}
               title={t('nav_sign_out')}
-              className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 transition cursor-pointer"
+              className="p-2.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/30 transition cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
           ) : (
             <NavLink
               to="/auth"
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-md shadow-teal-600/20 transition"
+              className="px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-black shadow-lg shadow-indigo-500/25 hover:brightness-110 transition"
             >
               {t('nav_sign_in')}
             </NavLink>
