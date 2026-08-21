@@ -4,6 +4,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
+from typing import Optional, Union
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -78,6 +79,17 @@ def initialize_database_schema():
                 brushed_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
         """)
+
+        # 3. Build the brushing_sessions table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS brushing_sessions (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                technique VARCHAR(255) NOT NULL,
+                duration INTEGER DEFAULT 120,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
         
         conn.commit()
         cursor.close()
@@ -120,8 +132,16 @@ class ReminderSavePayload(BaseModel):
 class ManualBrushPayload(BaseModel):
     userId: int
 
+class SessionRecordPayload(BaseModel):
+    userId: int
+    technique: str
+    duration: int = 120
+    timestamp: str = ""
+
 class ChatPayload(BaseModel):
     message: str
+    user_id: Optional[Union[int, str]] = 1
+    userId: Optional[Union[int, str]] = 1
     lang: str = "English"
 
 class AssessmentResponses(BaseModel):
@@ -229,6 +249,73 @@ async def log_manual_brushing(payload: ManualBrushPayload):
         raise HTTPException(status_code=500, detail=f"Database error: {str(error)}")
     finally:
         if conn: conn.close()
+
+@app.post("/api/sessions/")
+@app.post("/api/sessions")
+async def record_brushing_session(payload: SessionRecordPayload):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        
+        # Insert session record
+        cursor.execute(
+            "INSERT INTO brushing_sessions (user_id, technique, duration, created_at) VALUES (%s, %s, %s, CURRENT_TIMESTAMP) RETURNING id;",
+            (payload.userId, payload.technique, payload.duration)
+        )
+        
+        # Insert into brushing_logs for compliance calculation
+        cursor.execute(
+            "INSERT INTO brushing_logs (user_id, brushed_date) VALUES (%s, CURRENT_TIMESTAMP);",
+            (payload.userId,)
+        )
+
+        # Query total clean sessions
+        cursor.execute("SELECT COUNT(*) as clean_count FROM brushing_sessions WHERE user_id = %s;", (payload.userId,))
+        clean_sessions = cursor.fetchone()['clean_count'] or 0
+
+        # Query logged dates for streak calculation
+        cursor.execute(
+            "SELECT DISTINCT CAST(brushed_date AS DATE) as log_date FROM brushing_logs WHERE user_id = %s ORDER BY log_date DESC;", 
+            (payload.userId,)
+        )
+        rows = cursor.fetchall()
+        logged_dates = [row['log_date'] for row in rows]
+        
+        streak_days = 0
+        today_date = date.today()
+        check_date = today_date
+        if logged_dates:
+            if logged_dates[0] == today_date:
+                pass
+            elif logged_dates[0] == (today_date - timedelta(days=1)):
+                check_date = today_date - timedelta(days=1)
+            else:
+                check_date = None
+
+        if check_date:
+            for log_date in logged_dates:
+                if log_date == check_date:
+                    streak_days += 1
+                    check_date -= timedelta(days=1)
+                elif log_date < check_date:
+                    break
+
+        conn.commit()
+        cursor.close()
+
+        return {
+            "success": True,
+            "message": "Session recorded successfully.",
+            "unbroken_streak": int(streak_days),
+            "clean_sessions": int(clean_sessions)
+        }
+    except Exception as error:
+        if conn: conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Database session record failure: {str(error)}")
+    finally:
+        if conn: conn.close()
+
 
 # 🛠️ DYNAMIC HISTORICAL METRICS CALCULATOR
 @app.get("/api/dashboard/metrics/{user_id}")

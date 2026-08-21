@@ -10,21 +10,22 @@ import SuccessScreen from "./components/SuccessScreen";
 import DashboardScreen from "./components/DashboardScreen";
 import ChatbotScreen from "./components/ChatbotScreen";
 import ProfileScreen from "./components/ProfileScreen";
+import MirrorScreen from "./components/MirrorScreen";
 import SignUp from "./components/SignUp";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    Component: SplashScreen,
+    Component: AuthScreen,
   },
   {
     path: "/auth",
     Component: AuthScreen,
   },
   {
-path: "/signup",
-Component: SignUp,
-},
+    path: "/signup",
+    Component: SignUp,
+  },
   {
     path: "/demographics",
     Component: DemographicsScreen,
@@ -52,6 +53,14 @@ Component: SignUp,
   {
     path: "/dashboard",
     Component: DashboardScreen,
+  },
+  {
+    path: "/mirror",
+    Component: MirrorScreen,
+  },
+  {
+    path: "/smart-mirror",
+    Component: MirrorScreen,
   },
   {
     path: "/chatbot",

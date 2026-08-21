@@ -6,7 +6,14 @@ import { API_BASE_URL, fetchApiResilient, setCustomBackendIp, DETECTED_PC_IP } f
 export default function AuthScreen() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const modeParam = params.get("mode");
+      if (modeParam === "login" || modeParam === "forgot") return modeParam;
+    }
+    return "signup";
+  });
   
   const [name, setName] = useState("");
   const [email, setEmail] = useState("smahinoor376@gmail.com");
@@ -23,7 +30,6 @@ export default function AuthScreen() {
   const handleSaveCustomIp = () => {
     setCustomBackendIp(customIpInput);
     setShowIpConfig(false);
-    setMessage(`Updated Backend IP target to: http://${customIpInput.trim() || 'localhost'}:8000/api`);
     setIsError(false);
   };
 
@@ -58,14 +64,18 @@ export default function AuthScreen() {
           setMessage(data.detail || "Sign up failed.");
         } else if (data.success) {
           setIsError(false);
-          setMessage(data.message || "Account registered successfully! You can now log in.");
+          setMessage("Account registered successfully! Redirecting to setup...");
           
           if (data.user && data.user.id) {
             localStorage.setItem("user_session", JSON.stringify(data.user));
             localStorage.setItem("userId", data.user.id.toString());
             localStorage.setItem("userName", data.user.name || name);
+          } else {
+            localStorage.setItem("userName", name.trim() || "User");
           }
-          setMode("login");
+          setTimeout(() => {
+            navigate("/demographics");
+          }, 600);
         }
       } catch (err: any) {
         setIsLoading(false);
@@ -385,10 +395,13 @@ export default function AuthScreen() {
                   />
                   <button 
                     type="button" 
-                    onClick={() => setShowPassword(!showPassword)} 
-                    className="absolute right-3 top-1/2 -translate-y-1/2 min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                    tabIndex={-1}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setShowPassword((prev) => !prev)} 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer z-20"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
@@ -397,7 +410,7 @@ export default function AuthScreen() {
             <button 
               type="submit" 
               disabled={isLoading} 
-              className="w-full mt-2 py-4 min-h-[48px] rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-sm tracking-wide shadow-md shadow-sky-600/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+              className="w-full mt-2 py-4 min-h-[48px] rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm tracking-wide shadow-md shadow-teal-600/15 transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
             >
               <span>
                 {isLoading 

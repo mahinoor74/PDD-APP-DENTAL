@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./components/LanguageContext";
 import useGlobalReminders from "./components/useGlobalReminders";
 import AlarmModal from "./components/AlarmModal";
@@ -20,13 +20,23 @@ import LanguageScreen from "./components/LanguageScreen";
 
 function AppContent() {
   useGlobalReminders();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Every time the app opens or reloads, force landing on the Signup page (/auth)
+    const allowedOnboardingPaths = ["/auth", "/demographics", "/assessment", "/prescription"];
+    if (!allowedOnboardingPaths.includes(location.pathname)) {
+      navigate("/auth", { replace: true });
+    }
+  }, []);
 
   return (
     <>
       <AlarmModal />
       <Routes>
-        {/* 🧭 Onboarding Workflow Pipelines (No Bottom Navbar) */}
-        <Route path="/" element={<SplashScreen />} />
+        {/* 🧭 Onboarding Workflow Pipelines (Direct to Signup on launch) */}
+        <Route path="/" element={<Navigate to="/auth" replace />} />
         <Route path="/auth" element={<AuthScreen />} />
         <Route path="/demographics" element={<DemographicsScreen />} />
         <Route path="/language" element={<LanguageScreen />} />
@@ -41,7 +51,7 @@ function AppContent() {
         <Route path="/profile" element={<LayoutWithNavbar><ProfileScreen /></LayoutWithNavbar>} />
         
         {/* 🛡️ Catch-All */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/auth" replace />} />
       </Routes>
     </>
   );

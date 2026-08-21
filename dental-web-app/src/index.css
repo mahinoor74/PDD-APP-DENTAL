@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    /* Fresh, radiant medical aesthetic with soft pastel mesh */
+    background: radial-gradient(circle at 10% 20%, #E0F2FE 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, #D1FAE5 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #F0FDFA 0%, transparent 60%),
+                #F8FAFC;
+    min-height: 100vh;
+    color: #0F172A;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Fresh Clinical Card & Navigation Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(204, 251, 241, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(13, 148, 136, 0.06);
+}
+
+.glass-card {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: #ccfbf1;
+  box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-emerald-primary {
+  background: linear-gradient(135deg, #0d9488 0%, #059669 100%);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px 0 rgba(13, 148, 136, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-emerald-primary:hover {
+  background: linear-gradient(135deg, #0f766e 0%, #047857 100%);
+  box-shadow: 0 6px 20px 0 rgba(13, 148, 136, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0d9488;
+}

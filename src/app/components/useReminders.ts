@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { LocalNotifications } from "@capacitor/local-notifications";
 
-const CHANNEL_ID = "brushing_reminders";
+const CHANNEL_ID = "reminders";
 
 // Audio chime helper using Web Audio API (works without external asset files)
-const playAlarmChime = () => {
+export const playAlarmChime = () => {
   try {
     const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContext) return;
@@ -36,23 +36,23 @@ const createAndroidChannel = async () => {
   try {
     await LocalNotifications.createChannel({
       id: CHANNEL_ID,
-      name: "ToothMate Brushing Alarms",
+      name: "Hygiene Reminders",
       description: "Pop-up notifications for your morning & night dental habits",
       importance: 5, // 5 = High importance (causes Heads-Up banner pop-up on Android)
-      visibility: 1,
+      visibility: 1, // Public lock screen visibility
       sound: "default",
       vibration: true,
     });
   } catch (e) {
-    console.log("Channel setup handled or non-Capacitor environment.");
+    console.log("Channel setup handled or non-Capacitor environment.", e);
   }
 };
 
 // Service Worker Background Registration & Synchronization
 export const syncSettingsWithServiceWorker = () => {
   if ("serviceWorker" in navigator) {
-    const morningTime = localStorage.getItem("morningReminderTime") || "07:30";
-    const nightTime = localStorage.getItem("nightReminderTime") || "21:45";
+    const morningTime = localStorage.getItem("morningReminderTime") || localStorage.getItem("morning_time") || "07:30";
+    const nightTime = localStorage.getItem("nightReminderTime") || localStorage.getItem("night_time") || "21:45";
     const morningActive = localStorage.getItem("morningActive") !== "false";
     const nightActive = localStorage.getItem("nightActive") !== "false";
 
@@ -96,7 +96,22 @@ export const registerServiceWorkerReminders = async () => {
 export const requestCapacitorPermission = async (): Promise<boolean> => {
   let granted = false;
 
-  // 1. Web Browser Notification permission request sync
+  // 1. Capacitor Native Notification permission request sync
+  try {
+    let status = await LocalNotifications.checkPermissions();
+    if (status.display !== "granted") {
+      const perm = await LocalNotifications.requestPermissions();
+      status = perm;
+    }
+    if (status.display === "granted") {
+      granted = true;
+      await createAndroidChannel();
+    }
+  } catch (e) {
+    console.warn("Capacitor permissions request fallback to browser API", e);
+  }
+
+  // 2. Web Browser Notification permission request sync
   try {
     if (typeof window !== "undefined" && "Notification" in window && window.Notification) {
       if (window.Notification.permission === "granted") {
@@ -112,21 +127,6 @@ export const requestCapacitorPermission = async (): Promise<boolean> => {
     }
   } catch (e) {}
 
-  // 2. Capacitor Native Notification permission request sync
-  try {
-    let status = await LocalNotifications.checkPermissions();
-    if (status.display !== "granted") {
-      const perm = await LocalNotifications.requestPermissions();
-      status = perm;
-    }
-    if (status.display === "granted") {
-      granted = true;
-      await createAndroidChannel();
-    }
-  } catch (e) {
-    console.warn("Capacitor permissions request fallback to browser API", e);
-  }
-
   await registerServiceWorkerReminders();
   return granted;
 };
@@ -136,25 +136,102 @@ export const requestNotificationPermission = async () => {
   return await requestCapacitorPermission();
 };
 
-// Schedule a local test notification to fire in exactly 5 seconds
+// Parse time string e.g. "07:30" or "21:30" or "9:30 PM"
+export const parseTimeString = (timeStr: string) => {
+  if (!timeStr) return { hour: 7, minute: 30 };
+  const clean = timeStr.trim().toUpperCase();
+  const match = clean.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/);
+  if (!match) return { hour: 7, minute: 30 };
+  let hour = parseInt(match[1], 10);
+  const minute = parseInt(match[2], 10);
+  const ampm = match[3] ? match[3].toUpperCase() : null;
+  if (ampm === "PM" && hour < 12) hour += 12;
+  if (ampm === "AM" && hour === 12) hour = 0;
+  return { hour, minute };
+};
+
+export function getNextAlarmDate(hour: number, minute: number): Date {
+  const now = new Date();
+  const alarm = new Date();
+  alarm.setHours(hour, minute, 0, 0);
+  if (alarm.getTime() <= now.getTime()) {
+    alarm.setDate(alarm.getDate() + 1); // Schedule for tomorrow if time already passed today
+  }
+  return alarm;
+}
+
+// Schedule daily recurring morning & evening reminders
+export const scheduleDailyReminders = async (morningTimeStr: string, eveningTimeStr: string) => {
+  const morning = parseTimeString(morningTimeStr);
+  const evening = parseTimeString(eveningTimeStr);
+
+  try {
+    await requestCapacitorPermission();
+    await createAndroidChannel();
+
+    try {
+      await LocalNotifications.cancel({ notifications: [{ id: 1001 }, { id: 1002 }] });
+    } catch (e) {}
+
+    const morningDate = getNextAlarmDate(morning.hour, morning.minute);
+    const eveningDate = getNextAlarmDate(evening.hour, evening.minute);
+
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          title: "☀️ Morning Brush Time!",
+          body: "Start your day with a clean, confident smile! Log your morning brushing session now.",
+          id: 1001,
+          schedule: {
+            at: morningDate,
+            every: "day",
+            allowWhileIdle: true,
+            on: { hour: morning.hour, minute: morning.minute }
+          },
+          channelId: CHANNEL_ID,
+          sound: "default",
+          actionTypeId: "",
+          extra: { alarmType: "morning" }
+        },
+        {
+          title: "🌙 Night Brush Time!",
+          body: "Protect your enamel before bed! Ensure thorough coverage to complete today's goal.",
+          id: 1002,
+          schedule: {
+            at: eveningDate,
+            every: "day",
+            allowWhileIdle: true,
+            on: { hour: evening.hour, minute: evening.minute }
+          },
+          channelId: CHANNEL_ID,
+          sound: "default",
+          actionTypeId: "",
+          extra: { alarmType: "night" }
+        }
+      ]
+    });
+    console.log(`✅ Native OS Daily reminders scheduled: Morning (${morning.hour}:${morning.minute} -> ${morningDate.toLocaleTimeString()}), Evening (${evening.hour}:${evening.minute} -> ${eveningDate.toLocaleTimeString()})`);
+  } catch (e) {
+    console.error("Local Notification Schedule Error:", e);
+  }
+};
+
+// Schedule 5-second test notification
 export const schedule5SecTestNotification = async () => {
   const title = "🪥 ToothMate Hygiene Reminder";
   const body = "Great job! Your notification system is working perfectly.";
-  const fireDate = new Date(Date.now() + 5000); // 5 seconds delay
+  const fireDate = new Date(Date.now() + 5000);
   const notificationId = 9999;
 
-  // Force permission sync & channel registration
   await requestCapacitorPermission();
   await createAndroidChannel();
 
-  // 1. Schedule native Capacitor local notification (fires hardware alarm on lock screen)
   try {
     const status = await LocalNotifications.checkPermissions();
     if (status.display !== "granted") {
       await LocalNotifications.requestPermissions();
     }
     
-    // Cancel previous test notification if any
     try { await LocalNotifications.cancel({ notifications: [{ id: notificationId }] }); } catch (e) {}
 
     await LocalNotifications.schedule({
@@ -171,12 +248,10 @@ export const schedule5SecTestNotification = async () => {
         },
       ],
     });
-    console.log(`✅ Test notification scheduled for ${fireDate.toLocaleTimeString()}`);
   } catch (e) {
     console.warn("Capacitor 5s notification schedule fallback:", e);
   }
 
-  // 2. Service Worker timer fallback for Web PWA browsers
   if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
     try {
       navigator.serviceWorker.controller.postMessage({
@@ -186,7 +261,6 @@ export const schedule5SecTestNotification = async () => {
     } catch (e) {}
   }
 
-  // 3. In-App backup timeout if user stays inside the app
   setTimeout(() => {
     triggerInstantNotification(title, body, true);
   }, 5000);
@@ -232,6 +306,7 @@ export const triggerInstantNotification = async (title: string, message: string,
 
   // 1. Try Capacitor Local Notifications (Android / Native pop-up heads-up notification)
   try {
+    await requestCapacitorPermission();
     await createAndroidChannel();
     await LocalNotifications.schedule({
       notifications: [
@@ -239,8 +314,9 @@ export const triggerInstantNotification = async (title: string, message: string,
           title: title,
           body: message,
           id: Math.floor(Math.random() * 900000) + 100000,
-          schedule: { at: new Date(Date.now() + 500), allowWhileIdle: true }, // Trigger in 500ms
+          schedule: { at: new Date(Date.now() + 1000), allowWhileIdle: true },
           channelId: CHANNEL_ID,
+          sound: "default",
           actionTypeId: "",
           extra: null
         },
@@ -287,12 +363,9 @@ export const scheduleCapacitorReminder = async (
 ) => {
   syncSettingsWithServiceWorker();
 
-  // Cancel previous notification with this ID first to prevent duplicate or stale alarms
   try {
     await LocalNotifications.cancel({ notifications: [{ id }] });
-  } catch (e) {
-    // Ignore cancel error if notification was not registered before
-  }
+  } catch (e) {}
 
   if (!isActive || !time24h) {
     console.log(`⏰ Notification ID ${id} disabled or cleared.`);

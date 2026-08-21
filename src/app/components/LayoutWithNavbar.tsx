@@ -17,7 +17,7 @@ export default function LayoutWithNavbar({ children }: { children: React.ReactNo
   const currentUserName = localStorage.getItem("userName") || "ToothMate User";
 
   // Global Theme Mode State ('light' | 'dark')
-  const [theme, setTheme] = useState<string>(() => localStorage.getItem("theme") || "light");
+  const [theme, setTheme] = useState<string>(() => localStorage.getItem("theme") || "dark");
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
@@ -43,9 +43,9 @@ export default function LayoutWithNavbar({ children }: { children: React.ReactNo
 
   const getMobileTabClass = (path: string) => {
     const isSelected = activePath === path;
-    return `flex flex-col items-center justify-center min-h-[48px] flex-1 py-1 text-[11px] font-extrabold transition-all duration-200 active:scale-95 ${
+    return `flex flex-col items-center justify-center min-h-[48px] flex-1 py-1.5 transition-all duration-200 active:scale-95 ${
       isSelected 
-        ? "text-sky-500 scale-105" 
+        ? "text-cyan-400 scale-105 font-black" 
         : theme === "dark" ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-800"
     }`;
   };
@@ -55,20 +55,20 @@ export default function LayoutWithNavbar({ children }: { children: React.ReactNo
     if (theme === "dark") {
       return `flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200 min-h-[48px] ${
         isSelected
-          ? "bg-sky-500/20 text-cyan-300 border border-cyan-400/30 shadow-md shadow-cyan-500/10"
+          ? "bg-sky-500/20 text-cyan-300 border border-cyan-400/30 shadow-md shadow-cyan-500/10 font-bold"
           : "text-slate-300 hover:bg-slate-800/80 hover:text-white"
       }`;
     }
     return `flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200 min-h-[48px] ${
       isSelected
-        ? "bg-sky-500/10 text-sky-600 border border-sky-200/80 shadow-sm"
+        ? "bg-sky-500/10 text-sky-600 border border-sky-200/80 shadow-sm font-bold"
         : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
     }`;
   };
 
   return (
     <div className={`h-[100dvh] w-full flex flex-col md:flex-row font-sans antialiased transition-colors duration-300 selection:bg-sky-500 selection:text-white overflow-hidden ${
-      theme === "dark" ? "bg-slate-950 text-slate-100 dark" : "bg-slate-50 text-slate-900"
+      theme === "dark" ? "bg-slate-950 text-slate-100 dark" : "bg-[linear-gradient(135deg,#F8FAFC_0%,#F0FDFA_50%,#ECFDF5_100%)] text-slate-900"
     }`}>
       
       {/* Desktop Sticky Sidebar */}
@@ -81,14 +81,14 @@ export default function LayoutWithNavbar({ children }: { children: React.ReactNo
           {/* Logo & Brand Header */}
           <div className="flex items-center justify-between mb-6 px-1">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl gradient-teal flex items-center justify-center text-white shadow-md shadow-sky-500/20 animate-pulse-glow">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/20">
                 <Sparkles className="w-5 h-5 text-cyan-200" />
               </div>
               <div>
                 <h1 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-sky-400 via-teal-400 to-cyan-300 bg-clip-text text-transparent">
                   ToothMate
                 </h1>
-                <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">AI Dental Coach</p>
+                <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Teen Dental Coach</p>
               </div>
             </div>
 
@@ -113,24 +113,24 @@ export default function LayoutWithNavbar({ children }: { children: React.ReactNo
 
           {/* Navigation Links */}
           <nav className="space-y-2">
-            <Link to="/dashboard" className={getDesktopSidebarClass("/dashboard")}>
-              <LayoutDashboard className="w-5 h-5" />
-              <span>{t.dashboard}</span>
-            </Link>
-
             <Link to="/mirror" className={getDesktopSidebarClass("/mirror")}>
               <Camera className="w-5 h-5" />
-              <span>{t.smartMirror}</span>
+              <span>{t.smartMirror || "Mirror"}</span>
+            </Link>
+
+            <Link to="/dashboard" className={getDesktopSidebarClass("/dashboard")}>
+              <LayoutDashboard className="w-5 h-5" />
+              <span>{t.dashboard || "Dashboard"}</span>
             </Link>
 
             <Link to="/chatbot" className={getDesktopSidebarClass("/chatbot")}>
               <MessageSquare className="w-5 h-5" />
-              <span>{t.dentalChat}</span>
+              <span>{t.dentalChat || "Dr. Minty"}</span>
             </Link>
 
             <Link to="/profile" className={getDesktopSidebarClass("/profile")}>
               <User className="w-5 h-5" />
-              <span>{t.profile}</span>
+              <span>{t.profile || "Profile"}</span>
             </Link>
           </nav>
         </div>
@@ -143,14 +143,14 @@ export default function LayoutWithNavbar({ children }: { children: React.ReactNo
               : "bg-gradient-to-br from-sky-50 to-teal-50/60 border-sky-100/80"
           }`}>
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
+              <div className="w-9 h-9 rounded-full bg-cyan-500 text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
                 {currentUserName.charAt(0).toUpperCase()}
               </div>
               <div className="overflow-hidden flex-1">
                 <p className="text-xs font-bold truncate">{currentUserName}</p>
-                <div className="flex items-center gap-1 text-[10px] text-emerald-500 font-semibold mt-0.5">
+                <div className="flex items-center gap-1 text-[10px] text-emerald-400 font-semibold mt-0.5">
                   <ShieldCheck className="w-3 h-3" />
-                  <span>{t.proPlan}</span>
+                  <span>Teen Hygiene Plan</span>
                 </div>
               </div>
             </div>
@@ -170,46 +170,46 @@ export default function LayoutWithNavbar({ children }: { children: React.ReactNo
         </div>
       </aside>
 
-      {/* Main Content Container with Mobile Safe Padding */}
-      <main className="flex-1 w-full h-full overflow-y-auto pb-20 md:pb-6 flex justify-center">
-        <div className="w-full max-w-5xl px-3 sm:px-6 md:px-8 pt-3 md:pt-6 flex flex-col min-h-full">
+      {/* Main Content Container with Safe Top & Bottom Padding */}
+      <main className="flex-1 w-full h-full overflow-y-auto pt-10 md:pt-6 pb-32 md:pb-12 pt-[max(env(safe-area-inset-top),2.5rem)] pb-[max(env(safe-area-inset-bottom),8rem)] flex justify-center">
+        <div className="w-full max-w-5xl px-3 sm:px-6 md:px-8 flex flex-col min-h-full">
           {children}
         </div>
       </main>
 
-      {/* Mobile Sticky Bottom Floating Nav Bar */}
-      <nav className={`md:hidden fixed bottom-0 left-0 right-0 border-t min-h-[56px] h-16 flex items-center justify-around px-1 z-50 shadow-2xl backdrop-blur-xl transition-colors duration-300 ${
+      {/* Mobile Sticky Bottom Floating Nav Bar (Height h-20 / h-22, pb-6 safe area) */}
+      <nav className={`md:hidden fixed bottom-0 left-0 right-0 border-t h-20 pb-[max(env(safe-area-inset-bottom),1.5rem)] flex items-center justify-around px-2 z-50 shadow-2xl backdrop-blur-xl transition-colors duration-300 ${
         theme === "dark" 
           ? "bg-slate-900/95 border-slate-800 text-slate-100" 
           : "bg-white/95 border-slate-200/80 text-slate-900"
       }`}>
         <Link to="/mirror" className={getMobileTabClass("/mirror")}>
-          <Camera className="w-5 h-5 mb-0.5" />
-          <span>Mirror</span>
+          <Camera className="w-5 h-5 mb-1" />
+          <span className="text-[11px] font-extrabold tracking-tight">Mirror</span>
         </Link>
 
         <Link to="/dashboard" className={getMobileTabClass("/dashboard")}>
-          <LayoutDashboard className="w-5 h-5 mb-0.5" />
-          <span>Dashboard</span>
+          <LayoutDashboard className="w-5 h-5 mb-1" />
+          <span className="text-[11px] font-extrabold tracking-tight">Dashboard</span>
         </Link>
 
         <Link to="/chatbot" className={getMobileTabClass("/chatbot")}>
-          <MessageSquare className="w-5 h-5 mb-0.5" />
-          <span>Dr. Minty</span>
+          <MessageSquare className="w-5 h-5 mb-1" />
+          <span className="text-[11px] font-extrabold tracking-tight">Dr. Minty</span>
         </Link>
 
         <Link to="/profile" className={getMobileTabClass("/profile")}>
-          <User className="w-5 h-5 mb-0.5" />
-          <span>Profile</span>
+          <User className="w-5 h-5 mb-1" />
+          <span className="text-[11px] font-extrabold tracking-tight">Profile</span>
         </Link>
 
         <button 
           onClick={toggleTheme}
-          className="flex flex-col items-center justify-center min-h-[48px] flex-1 py-1 text-[11px] font-bold text-slate-400 hover:text-amber-400 active:scale-95 transition-all"
+          className="flex flex-col items-center justify-center min-h-[48px] flex-1 py-1.5 text-[11px] font-bold text-slate-400 hover:text-amber-400 active:scale-95 transition-all"
           title="Toggle Theme"
         >
-          {theme === "dark" ? <Sun className="w-5 h-5 mb-0.5 text-amber-300" /> : <Moon className="w-5 h-5 mb-0.5 text-slate-600" />}
-          <span>Theme</span>
+          {theme === "dark" ? <Sun className="w-5 h-5 mb-1 text-amber-300" /> : <Moon className="w-5 h-5 mb-1 text-slate-600" />}
+          <span className="text-[11px] font-extrabold tracking-tight">Theme</span>
         </button>
       </nav>
     </div>

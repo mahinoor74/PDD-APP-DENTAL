@@ -17,6 +17,9 @@ MODEL_PATH = os.path.join(BASE_DIR, "models", "dr_minty_10k_model.pkl")
 # Fallback: old chatbot model
 FALLBACK_MODEL_PATH = os.path.join(BASE_DIR, "models", "dr_minty_model.pkl")
 
+# Import persona intent handler
+from ai_service import handle_conversational_and_persona_intents
+
 # ─────────────────────────────────────────────
 # Typo & Slang Normalization Dictionary
 # ─────────────────────────────────────────────
@@ -59,7 +62,7 @@ CLINICAL_FALLBACK_CHIPS = [
     "Modified Bass technique guide",
     "How to care for braces?",
     "What causes toothache?",
-    "How often should I floss?",
+    "Tell me a dental joke",
 ]
 
 
@@ -69,11 +72,12 @@ class DrMintyLocalModel:
     Trained on dental_10000_dataset.json → dr_minty_10k_model.pkl
 
     Pipeline:
-      1. Typo & slang normalization
-      2. TF-IDF N-Gram Vectorisation (unigram–trigram, max 30,000 features)
-      3. Logistic Regression intent classification
-      4. Cosine Similarity nearest-neighbour response retrieval
-      5. Intelligent clinical fallback
+      1. Persona & Conversational intent matching (ai_service.py)
+      2. Typo & slang normalization
+      3. TF-IDF N-Gram Vectorisation (unigram–trigram, max 40,000 features)
+      4. Logistic Regression intent classification
+      5. Cosine Similarity nearest-neighbour response retrieval
+      6. Intelligent clinical fallback
     """
 
     def __init__(self):
@@ -94,7 +98,7 @@ class DrMintyLocalModel:
     # Model Loading
     # ────────────────────────────────────────
     def load_model(self) -> bool:
-        """Load dr_minty_10k_model.pkl.  Auto-trains if not found."""
+        """Load dr_minty_10k_model.pkl. Auto-trains if not found."""
         if not os.path.exists(MODEL_PATH):
             print(f"⚠️  10K model not found at {MODEL_PATH}. Auto-training from dental_10000_dataset.json …")
             try:
@@ -144,7 +148,6 @@ class DrMintyLocalModel:
         self.category_response_map = data.get("category_response_map", {})
         self.category_chips_map = data.get("category_chips_map", {})
 
-        # If maps weren't stored, rebuild from raw queries/responses
         if not self.category_response_map and self.queries:
             seen = {}
             for q, cat, resp in zip(self.queries, self.categories, self.responses):
@@ -181,6 +184,17 @@ class DrMintyLocalModel:
         if not raw:
             return self._greet_response()
 
+        # 1. Persona & Conversational Matrix Check (ai_service.py)
+        persona_resp = handle_conversational_and_persona_intents(raw)
+        if persona_resp:
+            return {
+                "response": persona_resp,
+                "text": persona_resp,
+                "category": "persona_conversational",
+                "confidence": 1.0,
+                "followUpChips": CLINICAL_FALLBACK_CHIPS,
+            }
+
         normalized = self._preprocess(raw)
 
         # Model not available → intelligent clinical fallback
@@ -188,23 +202,22 @@ class DrMintyLocalModel:
             return self._clinical_fallback()
 
         try:
-            # 1. Vectorise
+            # 2. Vectorise
             query_vec = self.vectorizer.transform([normalized])
 
-            # 2. Logistic Regression intent classification
+            # 3. Logistic Regression intent classification
             predicted_cat = str(self.classifier.predict(query_vec)[0])
             probs = self.classifier.predict_proba(query_vec)[0]
             lr_confidence = float(np.max(probs))
 
-            # 3. Cosine Similarity nearest-neighbour retrieval
+            # 4. Cosine Similarity nearest-neighbour retrieval
             sims = cosine_similarity(query_vec, self.tfidf_matrix)[0]
             top_idx = int(np.argmax(sims))
             top_sim = float(sims[top_idx])
 
-            # 4. Decide response strategy
+            # 5. Decide response strategy
             if top_sim > COSINE_THRESHOLD or lr_confidence > HIGH_CONFIDENCE_THRESHOLD:
 
-                # Use cosine-matched response for highest relevance
                 if top_sim > COSINE_THRESHOLD and self.responses:
                     best_response = self.responses[top_idx]
                 else:
@@ -234,7 +247,7 @@ class DrMintyLocalModel:
     def _greet_response(self) -> dict:
         resp = self.category_response_map.get(
             "greetings",
-            "Hello! I am Dr. Minty, your Senior AI Dental Coach. How can I assist you today?"
+            "Hello there! How can I help you take care of your teeth and gums today?"
         )
         return {
             "response": resp, "text": resp,

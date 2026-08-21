@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { triggerInstantNotification } from "./useReminders";
 
 export const useGlobalReminders = () => {
   const lastFiredMinute = useRef<string>("");
@@ -6,15 +7,15 @@ export const useGlobalReminders = () => {
   useEffect(() => {
     // Ensure default saved times exist in LocalStorage
     if (!localStorage.getItem("morning_time")) {
-      localStorage.setItem("morning_time", "08:00");
+      localStorage.setItem("morning_time", "07:30");
     }
     if (!localStorage.getItem("night_time")) {
-      localStorage.setItem("night_time", "21:00");
+      localStorage.setItem("night_time", "21:30");
     }
 
     const checkTimeAndTrigger = () => {
-      const rawMorning = localStorage.getItem("morning_time") || localStorage.getItem("morningReminderTime") || "08:00";
-      const rawNight = localStorage.getItem("night_time") || localStorage.getItem("nightReminderTime") || "21:00";
+      const rawMorning = localStorage.getItem("morning_time") || localStorage.getItem("morningReminderTime") || "07:30";
+      const rawNight = localStorage.getItem("night_time") || localStorage.getItem("nightReminderTime") || "21:30";
       const morningActive = localStorage.getItem("morningActive") !== "false";
       const nightActive = localStorage.getItem("nightActive") !== "false";
 
@@ -23,16 +24,18 @@ export const useGlobalReminders = () => {
       const minutes = String(now.getMinutes()).padStart(2, "0");
       const currentTime = `${hours}:${minutes}`;
 
-      // Helper to format any time string to "HH:mm" 24h format
+      // Helper to format any time string ("07:30", "7:30 AM", "9:30 PM", "09:39 AM") to "HH:mm" 24h format
       const formatHHMM = (tStr: string): string => {
         if (!tStr) return "";
         const clean = tStr.trim();
-        const parts = clean.match(/^(\d{1,2}):(\d{2})/);
+        const parts = clean.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
         if (!parts) return "";
         let h = parseInt(parts[1], 10);
         const m = parseInt(parts[2], 10);
-        if (clean.toUpperCase().includes("PM") && h < 12) h += 12;
-        if (clean.toUpperCase().includes("AM") && h === 12) h = 0;
+        const ampm = parts[3] ? parts[3].toUpperCase() : null;
+
+        if (ampm === "PM" && h < 12) h += 12;
+        if (ampm === "AM" && h === 12) h = 0;
         return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
       };
 
@@ -46,27 +49,17 @@ export const useGlobalReminders = () => {
 
       if (morningActive && morningTime && currentTime === morningTime) {
         lastFiredMinute.current = currentTime;
-        window.dispatchEvent(
-          new CustomEvent("toothmate-alarm-triggered", {
-            detail: {
-              title: "☀️ Morning Brush Time!",
-              body: "Start your day with a clean, confident smile! Log your morning brushing session now.",
-              type: "morning",
-              time: currentTime,
-            },
-          })
+        triggerInstantNotification(
+          "☀️ Morning Brush Time!",
+          "Start your day with a clean, confident smile! Log your morning toothbrushing session now.",
+          false
         );
       } else if (nightActive && nightTime && currentTime === nightTime) {
         lastFiredMinute.current = currentTime;
-        window.dispatchEvent(
-          new CustomEvent("toothmate-alarm-triggered", {
-            detail: {
-              title: "🌙 Night Brush Time!",
-              body: "Protect your enamel before bed! Ensure thorough coverage to complete today's goal.",
-              type: "night",
-              time: currentTime,
-            },
-          })
+        triggerInstantNotification(
+          "🌙 Night Brush Time!",
+          "Protect your enamel before bed! Complete your night toothbrushing routine now.",
+          false
         );
       }
     };
@@ -74,8 +67,8 @@ export const useGlobalReminders = () => {
     // Run check immediately on mount
     checkTimeAndTrigger();
 
-    // Clean, lightweight interval every 3 seconds
-    const interval = setInterval(checkTimeAndTrigger, 3000);
+    // Clean, lightweight interval every 1 second for exact instant trigger
+    const interval = setInterval(checkTimeAndTrigger, 1000);
 
     return () => clearInterval(interval);
   }, []);

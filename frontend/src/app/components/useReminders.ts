@@ -4,7 +4,7 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 const CHANNEL_ID = "reminders";
 
 // Audio chime helper using Web Audio API (works without external asset files)
-const playAlarmChime = () => {
+export const playAlarmChime = () => {
   try {
     const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContext) return;
@@ -140,12 +140,13 @@ export const requestNotificationPermission = async () => {
 export const parseTimeString = (timeStr: string) => {
   if (!timeStr) return { hour: 7, minute: 30 };
   const clean = timeStr.trim().toUpperCase();
-  const match = clean.match(/(\d{1,2}):(\d{2})/);
+  const match = clean.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/);
   if (!match) return { hour: 7, minute: 30 };
   let hour = parseInt(match[1], 10);
   const minute = parseInt(match[2], 10);
-  if (clean.includes("PM") && hour < 12) hour += 12;
-  if (clean.includes("AM") && hour === 12) hour = 0;
+  const ampm = match[3] ? match[3].toUpperCase() : null;
+  if (ampm === "PM" && hour < 12) hour += 12;
+  if (ampm === "AM" && hour === 12) hour = 0;
   return { hour, minute };
 };
 
@@ -215,6 +216,56 @@ export const scheduleDailyReminders = async (morningTimeStr: string, eveningTime
   }
 };
 
+// Schedule 5-second test notification
+export const schedule5SecTestNotification = async () => {
+  const title = "🪥 ToothMate Hygiene Reminder";
+  const body = "Great job! Your notification system is working perfectly.";
+  const fireDate = new Date(Date.now() + 5000);
+  const notificationId = 9999;
+
+  await requestCapacitorPermission();
+  await createAndroidChannel();
+
+  try {
+    const status = await LocalNotifications.checkPermissions();
+    if (status.display !== "granted") {
+      await LocalNotifications.requestPermissions();
+    }
+    
+    try { await LocalNotifications.cancel({ notifications: [{ id: notificationId }] }); } catch (e) {}
+
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          title: title,
+          body: body,
+          id: notificationId,
+          schedule: { at: fireDate, allowWhileIdle: true },
+          channelId: CHANNEL_ID,
+          sound: "default",
+          actionTypeId: "",
+          extra: { url: "/mirror" }
+        },
+      ],
+    });
+  } catch (e) {
+    console.warn("Capacitor 5s notification schedule fallback:", e);
+  }
+
+  if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+    try {
+      navigator.serviceWorker.controller.postMessage({
+        type: "SCHEDULE_5SEC_TEST",
+        payload: { title, body, delayMs: 5000 }
+      });
+    } catch (e) {}
+  }
+
+  setTimeout(() => {
+    triggerInstantNotification(title, body, true);
+  }, 5000);
+};
+
 // Speech synthesis alert helper
 export const speakAlarm = (text: string) => {
   try {
@@ -263,7 +314,7 @@ export const triggerInstantNotification = async (title: string, message: string,
           title: title,
           body: message,
           id: Math.floor(Math.random() * 900000) + 100000,
-          schedule: { at: new Date(Date.now() + 1000), allowWhileIdle: true }, // Trigger in 1s
+          schedule: { at: new Date(Date.now() + 1000), allowWhileIdle: true },
           channelId: CHANNEL_ID,
           sound: "default",
           actionTypeId: "",
@@ -312,12 +363,9 @@ export const scheduleCapacitorReminder = async (
 ) => {
   syncSettingsWithServiceWorker();
 
-  // Cancel previous notification with this ID first to prevent duplicate or stale alarms
   try {
     await LocalNotifications.cancel({ notifications: [{ id }] });
-  } catch (e) {
-    // Ignore cancel error if notification was not registered before
-  }
+  } catch (e) {}
 
   if (!isActive || !time24h) {
     console.log(`⏰ Notification ID ${id} disabled or cleared.`);
@@ -384,5 +432,3 @@ export const scheduleCapacitorReminder = async (
 
 // Re-export useGlobalReminders hook from dedicated useGlobalReminders module
 export { useGlobalReminders, default as useGlobalRemindersDefault } from "./useGlobalReminders";
-
-

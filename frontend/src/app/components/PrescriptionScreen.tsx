@@ -71,7 +71,7 @@ export default function PrescriptionScreen() {
           {technique}
         </h1>
         <p className="text-xs text-sky-100/90 font-medium mt-1">
-          ✨ Recommended by AI Clinical Engine for optimal daily oral hygiene.
+          ✨ {t.careStrategy || "Tailored Care Strategy"}
         </p>
       </div>
 
@@ -115,7 +115,7 @@ export default function PrescriptionScreen() {
           <div className="flex items-center justify-between">
             <h3 className="text-sm md:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
               <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
-              Clinical Motion Simulator & Technique Guide
+              {t.videoGuideTitle || "Clinical Motion Simulator & Technique Guide"}
             </h3>
             <button
               onClick={() => setIsSimulating(!isSimulating)}
@@ -241,6 +241,35 @@ export default function PrescriptionScreen() {
             </div>
           </div>
         )}
+
+        {/* 🪥 RECOMMENDED TOOTHBRUSH & TOOTHPASTE SUGGESTIONS */}
+        <div className="space-y-3 pt-1">
+          <h3 className="text-sm md:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+            <span>🪥</span> Prescribed Toothbrush & Toothpaste Suggestions
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 space-y-1">
+              <span className="text-[10px] font-black uppercase text-sky-600 dark:text-sky-400 tracking-wider">Toothbrush Specification</span>
+              <h4 className="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white">
+                {technique.includes("Charters") ? "Orthodontic V-Trim / Ultra-Soft Micro-Head" : "Ultra-Soft Tapered Bristle Brush"}
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-snug">
+                {technique.includes("Charters")
+                  ? "V-shaped bristle cut clears bracket margins without bending archwires or irritating gums."
+                  : "Soft 0.01mm micro-tapered end-rounded bristles reach deep into sulcular margins safely."}
+              </p>
+            </div>
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 space-y-1">
+              <span className="text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">Toothpaste Formulation</span>
+              <h4 className="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white">
+                Fluoride & Anti-Cavity Enamel Shield Paste
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-snug">
+                1450 ppm Stannous/Sodium Fluoride formula strengthens enamel surface and neutralizes plaque acid.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Action Buttons */}
         <div className="pt-3 flex flex-col sm:flex-row gap-2.5">

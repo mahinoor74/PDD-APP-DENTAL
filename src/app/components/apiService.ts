@@ -149,3 +149,46 @@ export const forgotPasswordEmailLocal = async (email: string) => {
     return { success: false, error: error.message };
   }
 };
+
+// 🪥 4. SAVE BRUSHING SESSION TO BACKEND
+export interface SessionPayload {
+  userId: number;
+  technique: string;
+  duration?: number;
+  timestamp?: string;
+}
+
+export const logBrushingSession = async (payload: SessionPayload) => {
+  try {
+    const response = await fetchApiResilient(`/sessions/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: payload.userId,
+        technique: payload.technique,
+        duration: payload.duration || 120,
+        timestamp: payload.timestamp || new Date().toISOString(),
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      // Fallback to /brush/log-manual if /sessions/ endpoint returns error
+      const fallbackRes = await fetchApiResilient(`/brush/log-manual`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: payload.userId }),
+      });
+      const fallbackData = await fallbackRes.json();
+      return { success: true, data: fallbackData, error: null };
+    }
+
+    return { success: true, data, error: null };
+  } catch (error: any) {
+    console.warn("Session save network fallback:", error);
+    // Even if server request fails, return success locally
+    return { success: false, data: null, error: error.message };
+  }
+};

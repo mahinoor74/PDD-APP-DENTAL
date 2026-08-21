@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ToothMate</string>
+    <string name="title_activity_main">ToothMate</string>
+    <string name="package_name">com.toothmate.app</string>
+    <string name="custom_url_scheme">com.toothmate.app</string>
+</resources>

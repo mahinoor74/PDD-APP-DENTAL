@@ -6,7 +6,14 @@ import { API_BASE_URL, fetchApiResilient, setCustomBackendIp, DETECTED_PC_IP } f
 export default function AuthScreen() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const modeParam = params.get("mode");
+      if (modeParam === "login" || modeParam === "forgot") return modeParam;
+    }
+    return "signup";
+  });
   
   const [name, setName] = useState("");
   const [email, setEmail] = useState("smahinoor376@gmail.com");
@@ -58,14 +65,18 @@ export default function AuthScreen() {
           setMessage(data.detail || "Sign up failed.");
         } else if (data.success) {
           setIsError(false);
-          setMessage(data.message || "Account registered successfully! You can now log in.");
+          setMessage("Account registered successfully! Redirecting to setup...");
           
           if (data.user && data.user.id) {
             localStorage.setItem("user_session", JSON.stringify(data.user));
             localStorage.setItem("userId", data.user.id.toString());
             localStorage.setItem("userName", data.user.name || name);
+          } else {
+            localStorage.setItem("userName", name.trim() || "User");
           }
-          setMode("login");
+          setTimeout(() => {
+            navigate("/demographics");
+          }, 600);
         }
       } catch (err: any) {
         setIsLoading(false);
@@ -385,8 +396,8 @@ export default function AuthScreen() {
                   />
                   <button 
                     type="button" 
-                    onClick={() => setShowPassword(!showPassword)} 
-                    className="absolute right-3 top-1/2 -translate-y-1/2 min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowPassword((prev) => !prev); }} 
+                    className="absolute right-3 top-1/2 -translate-y-1/2 min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer z-10"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
