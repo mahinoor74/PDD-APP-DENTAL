@@ -54,6 +54,12 @@ class DashboardViewModel(
     private val _weekData = MutableStateFlow<Pair<String, List<WeekDayData>>>(Pair("", emptyList()))
     val weekData: StateFlow<Pair<String, List<WeekDayData>>> = _weekData.asStateFlow()
 
+    val isDarkMode: StateFlow<Boolean> = UserPreferences.darkModeFlow
+
+    fun toggleDarkMode() {
+        prefs.toggleDarkMode()
+    }
+
     init {
         refreshDashboard()
         viewModelScope.launch {

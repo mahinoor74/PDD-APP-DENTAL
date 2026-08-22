@@ -2,12 +2,22 @@ package com.toothmate.app.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 
 class UserPreferences(context: Context) {
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences("toothmate_prefs", Context.MODE_PRIVATE)
+
+    init {
+        val currentStored = prefs.getBoolean(KEY_IS_DARK_MODE, false)
+        if (_darkModeFlow.value != currentStored) {
+            _darkModeFlow.value = currentStored
+        }
+    }
 
     var isLoggedIn: Boolean
         get() = prefs.getBoolean(KEY_IS_LOGGED_IN, false)
@@ -82,7 +92,16 @@ class UserPreferences(context: Context) {
 
     var isDarkMode: Boolean
         get() = prefs.getBoolean(KEY_IS_DARK_MODE, false)
-        set(value) = prefs.edit().putBoolean(KEY_IS_DARK_MODE, value).apply()
+        set(value) {
+            prefs.edit().putBoolean(KEY_IS_DARK_MODE, value).apply()
+            _darkModeFlow.value = value
+        }
+
+    fun toggleDarkMode(): Boolean {
+        val next = !isDarkMode
+        isDarkMode = next
+        return next
+    }
 
     var brushDaysUsed: Int
         get() = prefs.getInt(KEY_BRUSH_DAYS_USED, 42)
@@ -116,6 +135,9 @@ class UserPreferences(context: Context) {
     }
 
     companion object {
+        private val _darkModeFlow = MutableStateFlow(false)
+        val darkModeFlow: StateFlow<Boolean> = _darkModeFlow.asStateFlow()
+
         private const val KEY_IS_LOGGED_IN = "key_is_logged_in"
         private const val KEY_USER_NAME = "key_user_name"
         private const val KEY_USER_ROLE = "key_user_role"

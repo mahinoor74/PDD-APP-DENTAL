@@ -34,10 +34,14 @@ class MainActivity : ComponentActivity() {
             ToothMateTheme(darkTheme = isDarkMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = if (isDarkMode) androidx.compose.ui.graphics.Color(0xFF0F172A) else androidx.compose.ui.graphics.Color(0xFFF0FDFA)
                 ) {
                     val navController = rememberNavController()
-                    ToothMateNavGraph(navController = navController)
+                    ToothMateNavGraph(
+                        navController = navController,
+                        isDarkTheme = isDarkMode,
+                        onToggleTheme = { authViewModel.toggleDarkMode() }
+                    )
                 }
             }
         }

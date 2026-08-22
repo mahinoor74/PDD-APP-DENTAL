@@ -65,7 +65,9 @@ data class ChatMessage(
     val id: String = System.currentTimeMillis().toString(),
     val text: String,
     val isUser: Boolean,
-    val timestamp: String = ""
+    val timestamp: String = "",
+    val timeMillis: Long = System.currentTimeMillis(),
+    val suggestions: List<String> = emptyList()
 )
 
 data class Reminder(

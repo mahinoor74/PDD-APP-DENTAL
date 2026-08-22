@@ -36,6 +36,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.toothmate.app.data.local.UserPreferences
 import com.toothmate.app.data.model.ClinicalTechniquesRepository
 import com.toothmate.app.ui.components.BottomNavigationBar
 import com.toothmate.app.ui.components.CameraPreview
@@ -121,9 +122,12 @@ fun SmartMirrorScreen(navController: NavController, mirrorViewModel: MirrorViewM
     val isPrepPhase = !isRunning && secondsRemaining == 120
     val isFinishedPhase = secondsRemaining == 0
 
+    val prefs = remember { UserPreferences(context) }
+    val isDarkMode by UserPreferences.darkModeFlow.collectAsState()
+
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
-        bottomBar = { BottomNavigationBar(navController = navController) }
+        bottomBar = { BottomNavigationBar(navController = navController, isDarkTheme = isDarkMode, onToggleTheme = { prefs.toggleDarkMode() }) }
     ) { innerPadding ->
         Column(
             modifier = Modifier

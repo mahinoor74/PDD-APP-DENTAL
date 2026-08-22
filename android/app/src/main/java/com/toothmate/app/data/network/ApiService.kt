@@ -8,13 +8,40 @@ import retrofit2.http.POST
 
 data class ChatRequest(
     @SerializedName("message") val message: String,
-    @SerializedName("user_id") val userId: Int = 1
+    @SerializedName("user_id") val userId: Any = 1,
+    @SerializedName("userId") val userIdAlt: Any = 1,
+    @SerializedName("lang") val lang: String = "English"
 )
 
 data class ChatResponse(
-    @SerializedName("response") val response: String,
-    @SerializedName("status") val status: String = "success"
-)
+    @SerializedName("success") val success: Boolean? = true,
+    @SerializedName("response") val responseStr: String? = null,
+    @SerializedName("text") val textStr: String? = null,
+    @SerializedName("reply") val replyStr: String? = null,
+    @SerializedName("category") val category: String? = null,
+    @SerializedName("confidence") val confidence: Float? = 0f,
+    @SerializedName("followUpChips") val followUpChips: List<String>? = emptyList(),
+    @SerializedName("chips") val chips: List<String>? = emptyList(),
+    @SerializedName("suggestions") val suggestions: List<String>? = emptyList()
+) {
+    val responseText: String
+        get() = responseStr?.takeIf { it.isNotBlank() }
+            ?: textStr?.takeIf { it.isNotBlank() }
+            ?: replyStr?.takeIf { it.isNotBlank() }
+            ?: "I am Dr. Minty, your AI Dental Coach. How can I assist you today?"
+
+    val chipsList: List<String>
+        get() {
+            val list = followUpChips.orEmpty().ifEmpty { chips.orEmpty() }.ifEmpty { suggestions.orEmpty() }
+            return list.ifEmpty {
+                listOf(
+                    "How to reduce tooth sensitivity?",
+                    "Why do my gums bleed?",
+                    "Modified Bass technique guide"
+                )
+            }
+        }
+}
 
 data class PredictRequest(
     @SerializedName("age") val age: Int,

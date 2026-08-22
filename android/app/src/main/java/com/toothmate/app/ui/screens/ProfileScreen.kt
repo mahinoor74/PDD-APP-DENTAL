@@ -217,14 +217,17 @@ fun ProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
         }
     }
 
+    val isDarkMode by authViewModel.isDarkMode.collectAsState()
+    val screenBgColor = if (isDarkMode) Color(0xFF0F172A) else Color(0xFFF8FAFC)
+
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController) },
-        containerColor = Color(0xFFF8FAFC)
+        bottomBar = { BottomNavigationBar(navController = navController, isDarkTheme = isDarkMode, onToggleTheme = { authViewModel.toggleDarkMode() }) },
+        containerColor = screenBgColor
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF8FAFC))
+                .background(screenBgColor)
                 .statusBarsPadding()
                 .padding(
                     start = 16.dp,

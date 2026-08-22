@@ -42,8 +42,7 @@ class AuthViewModel(private val prefs: UserPreferences) : ViewModel() {
     private val _selectedSticker = MutableStateFlow(prefs.selectedSticker)
     val selectedSticker: StateFlow<String> = _selectedSticker.asStateFlow()
 
-    private val _isDarkMode = MutableStateFlow(prefs.isDarkMode)
-    val isDarkMode: StateFlow<Boolean> = _isDarkMode.asStateFlow()
+    val isDarkMode: StateFlow<Boolean> = UserPreferences.darkModeFlow
 
     private val _brushDaysUsed = MutableStateFlow(prefs.brushDaysUsed)
     val brushDaysUsed: StateFlow<Int> = _brushDaysUsed.asStateFlow()
@@ -57,9 +56,7 @@ class AuthViewModel(private val prefs: UserPreferences) : ViewModel() {
     }
 
     fun toggleDarkMode() {
-        val next = !prefs.isDarkMode
-        prefs.isDarkMode = next
-        _isDarkMode.value = next
+        prefs.toggleDarkMode()
     }
 
     fun resetBrushHead() {

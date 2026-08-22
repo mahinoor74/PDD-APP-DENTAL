@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.toothmate.app.data.local.UserPreferences
 import com.toothmate.app.data.model.ChatMessage
 import com.toothmate.app.data.repository.ChatRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,8 +25,16 @@ class ChatViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    val isDarkMode: StateFlow<Boolean> = UserPreferences.darkModeFlow
+
     private val _userName = MutableStateFlow(prefs.childName)
     val userName: StateFlow<String> = _userName.asStateFlow()
+
+    val defaultSuggestions = listOf(
+        "How to reduce tooth sensitivity?",
+        "Why do my gums bleed?",
+        "Modified Bass technique guide"
+    )
 
     init {
         refreshWelcomeMessage()
@@ -35,10 +44,14 @@ class ChatViewModel(
         val currentName = prefs.childName.ifBlank { prefs.userName }.ifBlank { "User" }
         _userName.value = currentName
         val timestamp = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
+        
+        val welcomeMsgText = "Hello $currentName! I am Dr. Minty, your local AI dental hygiene assistant. How can I help you today?"
+        
         val initialWelcome = ChatMessage(
-            text = "Hello $currentName! I'm Dr. Minty, your personal AI dental assistant. How can I help you with your teeth, gums, or oral care today?",
+            text = welcomeMsgText,
             isUser = false,
-            timestamp = timestamp
+            timestamp = timestamp,
+            suggestions = defaultSuggestions
         )
         if (_messages.value.isEmpty()) {
             _messages.value = listOf(initialWelcome)
@@ -58,10 +71,21 @@ class ChatViewModel(
         _messages.value = _messages.value + userMsg
         _isLoading.value = true
 
-        viewModelScope.launch {
-            val aiMsg = repository.getChatResponse(userText)
-            _messages.value = _messages.value + aiMsg
-            _isLoading.value = false
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val aiMsg = repository.getChatResponse(userText)
+                _messages.value = _messages.value + aiMsg
+            } catch (_: Exception) {
+                val fallbackMsg = ChatMessage(
+                    text = "I'm feeling minty fresh and ready to help! How can I assist with your teeth, gums, or oral hygiene today?",
+                    isUser = false,
+                    timestamp = dateFormat.format(Date()),
+                    suggestions = defaultSuggestions
+                )
+                _messages.value = _messages.value + fallbackMsg
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 }

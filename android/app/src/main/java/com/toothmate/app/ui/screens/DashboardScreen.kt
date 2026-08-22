@@ -20,14 +20,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Whatshot
+import java.time.LocalTime
+import java.util.Calendar
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -80,6 +84,7 @@ fun DashboardScreen(navController: NavController, dashboardViewModel: DashboardV
     val streakCount by dashboardViewModel.streakCount.collectAsState()
     val todayCompletedCount by dashboardViewModel.todayCompletedCount.collectAsState()
     val totalCleanSessions by dashboardViewModel.totalCleanSessions.collectAsState()
+    val isDarkMode by dashboardViewModel.isDarkMode.collectAsState()
 
     val morningAlarmTime by dashboardViewModel.morningAlarmTime.collectAsState()
     val nightAlarmTime by dashboardViewModel.nightAlarmTime.collectAsState()
@@ -94,16 +99,49 @@ fun DashboardScreen(navController: NavController, dashboardViewModel: DashboardV
     }
 
     val todayDate = remember { LocalDate.now() }
+    val currentHour = remember {
+        try {
+            LocalTime.now().hour
+        } catch (_: Exception) {
+            Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        }
+    }
+    val isMorningTime = currentHour in 4..15
 
-    // Scaffold with containerColor = TealLight
+    val screenBgColor = if (isDarkMode) Color(0xFF0F172A) else Color(0xFFF0FDFA)
+    val isGoalFinished = todayCompletedCount >= 2
+
+    val badgeText = when (todayCompletedCount) {
+        0 -> "0/2"
+        1 -> "1/2"
+        else -> "2/2 ✨"
+    }
+
+    val heroSubtitle = when (todayCompletedCount) {
+        0 -> if (isMorningTime) "Ready to brush? Complete your morning session!" else "Wind down for bed. Complete your night session!"
+        1 -> "Halfway there! Complete your night brush later."
+        else -> "🎉 Today's Goal Completed! Fantastic job!"
+    }
+
+    val launcherButtonText = when (todayCompletedCount) {
+        0, 1 -> if (isMorningTime) "Start Morning Brushing ▶" else "Start Night Brushing ▶"
+        else -> "✓ Goal Completed Today"
+    }
+
+    val logButtonText = when (todayCompletedCount) {
+        0 -> "Log Brush Now (Morning)"
+        1 -> "Log Brush Now (Night)"
+        else -> "✓ Goal Completed Today"
+    }
+
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController) },
-        containerColor = TealLight
+        bottomBar = { BottomNavigationBar(navController = navController, isDarkTheme = isDarkMode, onToggleTheme = { dashboardViewModel.toggleDarkMode() }) },
+        containerColor = screenBgColor
     ) { _ ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(TealLight)
+                .background(screenBgColor)
                 .statusBarsPadding()
                 .padding(top = 8.dp),
             contentPadding = PaddingValues(
@@ -130,7 +168,7 @@ fun DashboardScreen(navController: NavController, dashboardViewModel: DashboardV
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                // Progress Circle (0/2, 1/2, 2/2)
+                                // Progress Circle (0/2, 1/2, 2/2 ✨)
                                 Box(
                                     modifier = Modifier
                                         .size(56.dp)
@@ -139,9 +177,9 @@ fun DashboardScreen(navController: NavController, dashboardViewModel: DashboardV
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = "$todayCompletedCount/2",
+                                        text = badgeText,
                                         fontWeight = FontWeight.Black,
-                                        fontSize = 18.sp,
+                                        fontSize = if (todayCompletedCount >= 2) 13.sp else 18.sp,
                                         color = Color.White
                                     )
                                 }
@@ -162,12 +200,9 @@ fun DashboardScreen(navController: NavController, dashboardViewModel: DashboardV
                                         color = Color.White
                                     )
                                     Text(
-                                        text = when (todayCompletedCount) {
-                                            0 -> "Ready to brush? Complete your morning session!"
-                                            1 -> "Great morning start! 1 night session left to hit your goal."
-                                            else -> "Great job! Both daily sessions completed!"
-                                        },
+                                        text = heroSubtitle,
                                         fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
                                         color = Color.White.copy(alpha = 0.9f)
                                     )
                                 }
@@ -181,51 +216,70 @@ fun DashboardScreen(navController: NavController, dashboardViewModel: DashboardV
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Dynamic Action Button (Start Morning Brushing ▶ / Start Night Brushing ▶ / ✓ Goal Completed Today)
+                            // 1. "Log Brush Now" Interactive Goal Progression Button
                             Button(
                                 onClick = {
-                                    if (todayCompletedCount < 2) {
-                                        navController.navigate(Screen.SmartMirror.route)
+                                    if (!isGoalFinished) {
+                                        dashboardViewModel.logBrushingSession()
                                     }
                                 },
-                                enabled = todayCompletedCount < 2,
+                                enabled = !isGoalFinished,
                                 shape = RoundedCornerShape(16.dp),
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(0xFF06B6D4),
-                                    disabledContainerColor = Color(0xFF0F766E)
+                                    disabledContainerColor = Color(0xFF0F766E).copy(alpha = 0.6f),
+                                    disabledContentColor = Color.White.copy(alpha = 0.7f)
                                 ),
-                                modifier = Modifier.weight(1.3f)
+                                modifier = Modifier.weight(1.1f)
                             ) {
-                                Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
+                                Icon(
+                                    imageVector = if (isGoalFinished) Icons.Default.Lock else Icons.Default.AddCircle,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = Color.White
+                                )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = when (todayCompletedCount) {
-                                        0 -> "Start Morning Brushing ▶"
-                                        1 -> "Start Night Brushing ▶"
-                                        else -> "✓ Goal Completed Today"
-                                    },
-                                    fontSize = 12.sp,
+                                    text = logButtonText,
+                                    fontSize = 11.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = Color.White
                                 )
                             }
 
-                            // Profile Button
+                            // 2. Time-Based Brushing Session Launcher Button
                             Button(
-                                onClick = { navController.navigate(Screen.Profile.route) },
+                                onClick = {
+                                    if (!isGoalFinished) {
+                                        navController.navigate(Screen.SmartMirror.route)
+                                    }
+                                },
+                                enabled = !isGoalFinished,
                                 shape = RoundedCornerShape(16.dp),
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.White,
-                                    contentColor = Color(0xFF0F766E)
+                                    contentColor = Color(0xFF0F766E),
+                                    disabledContainerColor = Color.White.copy(alpha = 0.4f),
+                                    disabledContentColor = Color.White.copy(alpha = 0.8f)
                                 ),
                                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
-                                modifier = Modifier.weight(0.9f)
+                                modifier = Modifier.weight(1.1f)
                             ) {
-                                Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFF0F766E), modifier = Modifier.size(16.dp))
+                                Icon(
+                                    imageVector = if (isGoalFinished) Icons.Default.CheckCircle else Icons.Default.CameraAlt,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = if (isGoalFinished) Color.White else Color(0xFF0F766E)
+                                )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Profile", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF0F766E))
+                                Text(
+                                    text = launcherButtonText,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = if (isGoalFinished) Color.White else Color(0xFF0F766E)
+                                )
                             }
                         }
                     }

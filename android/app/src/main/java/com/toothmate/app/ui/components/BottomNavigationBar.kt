@@ -46,10 +46,16 @@ sealed class BottomNavItem(val title: String, val route: String, val icon: Image
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(
+    navController: NavController,
+    isDarkTheme: Boolean? = null,
+    onToggleTheme: (() -> Unit)? = null
+) {
     val context = LocalContext.current
-    val authViewModel = remember { AuthViewModel(UserPreferences(context)) }
-    val isDarkMode by authViewModel.isDarkMode.collectAsState()
+    val prefs = remember { UserPreferences(context) }
+    val currentDarkModeState by UserPreferences.darkModeFlow.collectAsState()
+
+    val isDarkMode = isDarkTheme ?: currentDarkModeState
 
     val items = listOf(
         BottomNavItem.Mirror,
@@ -112,7 +118,11 @@ fun BottomNavigationBar(navController: NavController) {
                     ),
                     onClick = {
                         if (isThemeTab) {
-                            authViewModel.toggleDarkMode()
+                            if (onToggleTheme != null) {
+                                onToggleTheme()
+                            } else {
+                                prefs.toggleDarkMode()
+                            }
                         } else if (currentRoute != item.route) {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId) {

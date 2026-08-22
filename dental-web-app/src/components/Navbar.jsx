@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import {
   LayoutDashboard,
   Camera,
@@ -14,6 +15,8 @@ import {
   ShieldCheck,
   Globe,
   ChevronDown,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 const LANG_OPTIONS = [
@@ -29,6 +32,7 @@ const LANG_OPTIONS = [
 export const Navbar = () => {
   const { user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
+  const { isDarkTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -95,8 +99,17 @@ export const Navbar = () => {
           })}
         </nav>
 
-        {/* Language Selector & User Profile Badge */}
+        {/* Language Selector, Theme Toggle & User Profile Badge */}
         <div className="flex items-center gap-3 shrink-0">
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center p-2 rounded-xl border border-indigo-500/40 bg-slate-800/90 text-slate-200 hover:bg-slate-700/80 shadow-md transition cursor-pointer"
+            title={isDarkTheme ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {isDarkTheme ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+          </button>
+
           {/* Global Language Selector Dropdown */}
           <div className="relative">
             <button
