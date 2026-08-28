@@ -58,6 +58,30 @@ data class PredictResponse(
     @SerializedName("recommendations") val recommendations: List<String>
 )
 
+data class TechniqueRecommendRequest(
+    @SerializedName("age_group") val ageGroup: Int = 1,
+    @SerializedName("has_braces") val hasBraces: Int = 0,
+    @SerializedName("has_implants_bridges") val hasImplantsBridges: Int = 0,
+    @SerializedName("bleeding_gums") val bleedingGums: Int = 0,
+    @SerializedName("gum_recession") val gumRecession: Int = 0,
+    @SerializedName("tooth_sensitivity") val toothSensitivity: Int = 0,
+    @SerializedName("limited_dexterity") val limitedDexterity: Int = 0,
+    @SerializedName("plaque_buildup") val plaqueBuildup: Int = 0
+)
+
+data class TechniqueRecommendResponse(
+    @SerializedName("recommended_technique") val recommendedTechnique: String,
+    @SerializedName("confidence_score") val confidenceScore: Float,
+    @SerializedName("clinical_rationale") val clinicalRationale: String,
+    @SerializedName("key_features") val keyFeatures: List<String> = emptyList(),
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("whatItIs") val whatItIs: String? = null,
+    @SerializedName("howItWorks") val howItWorks: String? = null,
+    @SerializedName("precautions") val precautions: List<String>? = emptyList(),
+    @SerializedName("steps") val steps: List<String>? = emptyList(),
+    @SerializedName("videoUrl") val videoUrl: String? = null
+)
+
 interface ApiService {
     @GET("/")
     suspend fun checkHealth(): Response<Map<String, String>>
@@ -67,4 +91,7 @@ interface ApiService {
 
     @POST("/api/predict")
     suspend fun predictRisk(@Body request: PredictRequest): Response<PredictResponse>
+
+    @POST("api/technique/recommend")
+    suspend fun recommendTechnique(@Body request: TechniqueRecommendRequest): Response<TechniqueRecommendResponse>
 }

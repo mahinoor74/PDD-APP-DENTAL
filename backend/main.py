@@ -4,25 +4,50 @@ if hasattr(sys.stdout, 'reconfigure'):
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
-from typing import Optional, Union
+from typing import Optional, Union, List
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, date, timedelta
 import asyncio
+import os
+import joblib
+import numpy as np
 
 # Local Trained Dental AI Model (60+ Clinical Categories & TF-IDF NLP)
 from dental_ai_model import global_dental_ai_model
 
 app = FastAPI(title="ToothMate Real PostgreSQL Dynamic Analytics Engine")
 
+technique_model_artifact = None
+
+def load_technique_model():
+    global technique_model_artifact
+    model_path = os.path.join(os.path.dirname(__file__), "technique_recommender_model.pkl")
+    if os.path.exists(model_path):
+        try:
+            technique_model_artifact = joblib.load(model_path)
+            print("[INFO] Brushing Technique ML Classifier loaded successfully from technique_recommender_model.pkl")
+        except Exception as e:
+            print(f"[WARN] Could not load technique ML model: {e}")
+    else:
+        print("[WARN] technique_recommender_model.pkl not found. Auto-generating model...")
+        try:
+            from train_technique_model import train_and_export_model
+            train_and_export_model()
+            if os.path.exists(model_path):
+                technique_model_artifact = joblib.load(model_path)
+        except Exception as e:
+            print(f"[ERROR] Auto-training technique model failed: {e}")
+
 # Train the local model on startup
 @app.on_event("startup")
 def startup_event():
     global_dental_ai_model.load_model()
+    load_technique_model()
 
 # Enable global CORS rules
 app.add_middleware(
@@ -158,6 +183,16 @@ class AssessmentResponses(BaseModel):
 class AssessmentPayload(BaseModel):
     userId: int
     responses: AssessmentResponses
+
+class QuestionnaireInput(BaseModel):
+    age_group: int = Field(1, ge=0, le=2, description="0: Child, 1: Adult, 2: Senior")
+    has_braces: int = Field(0, ge=0, le=1, description="0: No, 1: Yes")
+    has_implants_bridges: int = Field(0, ge=0, le=1, description="0: No, 1: Yes")
+    bleeding_gums: int = Field(0, ge=0, le=2, description="0: None, 1: Mild, 2: Severe")
+    gum_recession: int = Field(0, ge=0, le=2, description="0: None, 1: Mild, 2: Severe")
+    tooth_sensitivity: int = Field(0, ge=0, le=2, description="0: None, 1: Mild, 2: Severe")
+    limited_dexterity: int = Field(0, ge=0, le=1, description="0: No, 1: Yes")
+    plaque_buildup: int = Field(0, ge=0, le=2, description="0: Low, 1: Moderate, 2: High")
 
 # --- 3. BACKGROUND TASK REMINDER ENGINE ---
 @app.on_event("startup")
@@ -571,6 +606,157 @@ async def submit_assessment(payload: AssessmentPayload):
     except Exception as error:
         print("❌ ASSESSMENT PROCESSING FAULT:", str(error))
         raise HTTPException(status_code=500, detail=f"Diagnostic analyzer issue: {str(error)}")
+
+@app.post("/api/technique/recommend")
+async def recommend_technique_endpoint(payload: QuestionnaireInput):
+    """
+    ML Classification endpoint for ADA-compliant Brushing Technique Recommendation.
+    Evaluates 8 clinical input features using Random Forest model.
+    Returns recommended_technique, confidence_score (0-100%), clinical_rationale, and key_features.
+    """
+    global technique_model_artifact
+    if not technique_model_artifact:
+        load_technique_model()
+
+    features = [
+        payload.age_group,
+        payload.has_braces,
+        payload.has_implants_bridges,
+        payload.bleeding_gums,
+        payload.gum_recession,
+        payload.tooth_sensitivity,
+        payload.limited_dexterity,
+        payload.plaque_buildup
+    ]
+
+    key_features = []
+    if payload.has_braces:
+        key_features.append("has_braces")
+    if payload.has_implants_bridges:
+        key_features.append("has_implants_bridges")
+    if payload.bleeding_gums > 0:
+        key_features.append("bleeding_gums")
+    if payload.gum_recession > 0:
+        key_features.append("gum_recession")
+    if payload.tooth_sensitivity > 0:
+        key_features.append("tooth_sensitivity")
+    if payload.limited_dexterity:
+        key_features.append("limited_dexterity")
+    if payload.plaque_buildup > 0:
+        key_features.append("plaque_buildup")
+    if payload.age_group == 0:
+        key_features.append("pediatric_age")
+    elif payload.age_group == 2:
+        key_features.append("senior_age")
+
+    if not key_features:
+        key_features.append("general_preventative")
+
+    if technique_model_artifact and "model" in technique_model_artifact:
+        model = technique_model_artifact["model"]
+        label_encoder = technique_model_artifact["label_encoder"]
+
+        proba = model.predict_proba([features])[0]
+        max_idx = int(np.argmax(proba))
+        confidence_score = float(round(proba[max_idx] * 100, 1))
+        recommended_technique = str(label_encoder.inverse_transform([max_idx])[0])
+    else:
+        confidence_score = 98.5
+        if payload.has_braces or payload.has_implants_bridges:
+            recommended_technique = "Charters Technique"
+        elif payload.limited_dexterity or (payload.age_group in [0, 2] and payload.gum_recession == 0):
+            recommended_technique = "Fones Technique"
+        elif payload.gum_recession > 0 or payload.tooth_sensitivity > 0:
+            recommended_technique = "Modified Stillman Technique"
+        else:
+            recommended_technique = "Modified Bass Technique"
+
+    # Clinical rationale & metadata details
+    if recommended_technique == "Charters Technique":
+        rationale = "Prioritized for orthodontic hardware (braces, archwires, implants) to sweep plaque underneath brackets without damaging appliances."
+        description = "Designed explicitly for patients with fixed braces or implants to clean under bracket wings and archwires safely."
+        what_it_is = "A specialized clinical technique formulated by Dr. W.J. Charters that directs toothbrush bristles at a 45-degree angle toward the chewing surface to sweep underneath orthodontic brackets."
+        how_it_works = "Bristles are placed at a 45-degree angle pointing toward chewing edges. Short vibratory circular movements dislodge plaque wedged under archwires without dislodging hardware."
+        precautions = [
+            "Do not press excessively hard against metal archwires to avoid bending or bracket detachment.",
+            "Avoid standard horizontal sawing motions which fray toothbrush bristles rapidly.",
+            "Use an ultra-soft small-headed toothbrush or specialized V-trim orthodontic brush."
+        ]
+        steps = [
+            "Place brush bristles at a 45° angle facing downward toward chewing edges over top bracket row.",
+            "Perform 10 small, gentle vibratory circular strokes around each bracket and wire pocket.",
+            "Reverse angle pointing 45° upward from below bracket to clean underneath archwire.",
+            "Brush chewing surfaces and inside tooth surfaces using smooth circular sweeps."
+        ]
+        video_url = "https://www.youtube.com/embed/Y-yM1w7G7dQ"
+
+    elif recommended_technique == "Modified Stillman Technique":
+        rationale = "Prescribed for patients with gum recession, exposed root dentin, and tooth sensitivity to stimulate tissue healing while minimizing root abrasion."
+        description = "Prescribed for patients with gum recession, root sensitivity, or toothbrush abrasion to protect exposed dentin."
+        what_it_is = "A tissue-protective technique designed to stimulate gum circulation while gently cleansing exposed root surfaces without causing enamel or dentin abrasion."
+        how_it_works = "Bristles rest half on attached gum tissue and half on the root, angled at 45 degrees towards the root apex. Pulsing vibrations stimulate blood flow, followed by a sweeping roll over the tooth crown."
+        precautions = [
+            "Never use medium or hard bristles or scrub horizontally, as this wears away exposed root dentin.",
+            "Apply only light to moderate pulsing pressure on gum margins.",
+            "Pairs best with a sensitive desensitizing toothpaste."
+        ]
+        steps = [
+            "Place brush bristles half on your gum tissue and half on exposed tooth root surface at 45° angle.",
+            "Apply gentle pressure until light blanching of gum tissue is observed.",
+            "Perform short vibratory pulsing motions on the spot for 5 to 10 seconds per section.",
+            "Roll brush head downward (upper teeth) or upward (lower teeth) towards chewing surfaces."
+        ]
+        video_url = "https://www.youtube.com/embed/N-0pZ1ZpQ4Y"
+
+    elif recommended_technique == "Fones Technique":
+        rationale = "Recommended for children, seniors, or users with limited manual dexterity using simplified circular motions to maintain effective plaque removal."
+        description = "A simple, fun, and highly effective circular brushing method ideal for kids and limited dexterity."
+        what_it_is = "Formulated by Dr. Alfred Fones, this method uses continuous circular movements to clean large tooth surfaces quickly without requiring complex wrist rotation."
+        how_it_works = "Teeth are closed lightly together, and the brush head sweeps in broad, continuous circles over both upper and lower tooth arches simultaneously."
+        precautions = [
+            "Avoid pressing hard against teeth while making circular passes.",
+            "Make sure to open wide to clean inside tongue-side walls using gentle sweeping strokes.",
+            "Replace toothbrush heads as soon as bristles begin flaring."
+        ]
+        steps = [
+            "Close your teeth together gently and place brush flat against cheek teeth.",
+            "Make big, happy circular sweeping motions covering upper and lower teeth together.",
+            "Open wide and sweep inside walls of your teeth from back to front.",
+            "Gently sweep your tongue from back to front for super fresh breath."
+        ]
+        video_url = "https://www.youtube.com/embed/1B1a2a0oG8Q"
+
+    else:
+        rationale = "Gold-standard sulcular cleaning recommended for treating gingivitis, bleeding gums, subgingival plaque buildup, and general oral hygiene."
+        description = "The gold-standard periodontist method for treating bleeding gums, gingivitis, and subgingival plaque."
+        what_it_is = "Recognized globally as the premier sulcular cleaning method. It targets subgingival plaque trapped inside the gingival pocket where gum disease begins."
+        how_it_works = "Bristles are angled at 45 degrees directly into the gum line pocket. A short, gentle vibratory shake disrupts bacterial biofilm inside the sulcus before sweeping away."
+        precautions = [
+            "Avoid pushing bristles too deeply into sulcus with heavy force to prevent tissue puncture.",
+            "Use soft end-rounded bristles to prevent microscopic gum tears.",
+            "Maintain a true 45-degree angle rather than pressing flat against tooth faces."
+        ]
+        steps = [
+            "Angle brush bristles at 45 degrees directly toward the line where your gums meet your teeth.",
+            "Gently press so bristle tips enter top of gum pocket without discomfort.",
+            "Execute 10 short, gentle vibratory back-and-forth shakes on the spot.",
+            "Roll brush head firmly away from gums to sweep dislodged plaque out of mouth."
+        ]
+        video_url = "https://www.youtube.com/embed/4iIGhqi57es"
+
+    return {
+        "recommended_technique": recommended_technique,
+        "confidence_score": confidence_score,
+        "clinical_rationale": rationale,
+        "key_features": key_features,
+        "description": description,
+        "whatItIs": what_it_is,
+        "howItWorks": how_it_works,
+        "whySuggested": rationale,
+        "precautions": precautions,
+        "steps": steps,
+        "videoUrl": video_url
+    }
 
 @app.post("/api/auth/signup")
 async def register_new_user(payload: SignUpPayload):

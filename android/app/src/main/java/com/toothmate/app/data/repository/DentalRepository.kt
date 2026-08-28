@@ -80,6 +80,35 @@ class DentalRepository(
         return assessment
     }
 
+    suspend fun getBrushingTechniqueRecommendation(
+        ageGroup: Int = 1,
+        hasBraces: Int = 0,
+        hasImplantsBridges: Int = 0,
+        bleedingGums: Int = 0,
+        gumRecession: Int = 0,
+        toothSensitivity: Int = 0,
+        limitedDexterity: Int = 0,
+        plaqueBuildup: Int = 0
+    ): com.toothmate.app.data.network.TechniqueRecommendResponse? {
+        return try {
+            val response = apiService.recommendTechnique(
+                com.toothmate.app.data.network.TechniqueRecommendRequest(
+                    ageGroup = ageGroup,
+                    hasBraces = hasBraces,
+                    hasImplantsBridges = hasImplantsBridges,
+                    bleedingGums = bleedingGums,
+                    gumRecession = gumRecession,
+                    toothSensitivity = toothSensitivity,
+                    limitedDexterity = limitedDexterity,
+                    plaqueBuildup = plaqueBuildup
+                )
+            )
+            if (response.isSuccessful) response.body() else null
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     fun generatePrescription(assessment: DentalAssessment): Prescription {
         val medications = mutableListOf<Medication>()
         val instructions = mutableListOf<String>()

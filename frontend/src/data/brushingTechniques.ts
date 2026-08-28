@@ -190,3 +190,6 @@ export const CLINICAL_TECHNIQUES: BrushingTechnique[] = [
 export function getTechniqueById(id: string): BrushingTechnique {
   return CLINICAL_TECHNIQUES.find((t) => t.id === id) || CLINICAL_TECHNIQUES[0];
 }
+
+export const BRUSHING_TECHNIQUES = CLINICAL_TECHNIQUES;
+

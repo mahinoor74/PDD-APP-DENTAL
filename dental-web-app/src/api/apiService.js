@@ -97,6 +97,21 @@ export const apiService = {
     return res.data;
   },
 
+  // ML Brushing Technique Recommendation
+  async recommendTechnique(payload) {
+    const res = await api.post('/api/technique/recommend', {
+      age_group: Number(payload.age_group ?? 1),
+      has_braces: payload.has_braces ? 1 : 0,
+      has_implants_bridges: payload.has_implants_bridges ? 1 : 0,
+      bleeding_gums: Number(payload.bleeding_gums ?? 0),
+      gum_recession: Number(payload.gum_recession ?? 0),
+      tooth_sensitivity: Number(payload.tooth_sensitivity ?? 0),
+      limited_dexterity: payload.limited_dexterity ? 1 : 0,
+      plaque_buildup: Number(payload.plaque_buildup ?? 0),
+    });
+    return res.data;
+  },
+
   // Chat with Dr. Minty (100% Local ML)
   async sendChatMessage(message, userId = 1, lang = 'English') {
     const res = await api.post('/api/chat', {
